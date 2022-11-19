@@ -6,6 +6,21 @@ export const selectGroups = createSelector(
   (groups) => groups
 );
 
+export const selectProfessors = createSelector(
+  ({ schedule: { professors } }: RootState) => professors,
+  (professors) => professors
+);
+
+export const selectSelectedProfessors = createSelector(
+  ({ schedule: { selectedProfessors } }: RootState) => selectedProfessors,
+  (selectedProfessors) => selectedProfessors
+);
+
+export const selectProfessorIDs = createSelector(
+  ({ schedule: { selectedProfessorIDs } }: RootState) => selectedProfessorIDs,
+  (selectedProfessorIDs) => selectedProfessorIDs
+);
+
 export const selectSubjectID = createSelector(
   ({ schedule: { selectedSubjectID } }: RootState) => selectedSubjectID,
   (selectedSubjectID) => selectedSubjectID

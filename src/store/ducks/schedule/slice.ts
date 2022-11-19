@@ -1,24 +1,32 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SelectType, SubjectType } from "../../../types";
+import { SelectType, SubjectType, ProfessorType } from "../../../types";
 import { fetchGroups } from "./actions";
 
 type ScheduleSliceType = {
   groupID: string;
   groupName: string;
   groups: SelectType[];
+
   week: string[];
   weekday: string;
+
   selectedSubjectID: string;
   subjects: SubjectType[];
   selectedSubject: SubjectType;
+
+  selectedProfessorIDs: string[];
+  professors: ProfessorType[];
+  selectedProfessors: ProfessorType[];
 };
 
 const initialState: ScheduleSliceType = {
   groupID: "",
   groupName: "",
   groups: [],
+
   week: [],
   weekday: "",
+
   selectedSubjectID: "",
   subjects: [],
   selectedSubject: {
@@ -26,6 +34,10 @@ const initialState: ScheduleSliceType = {
     professors: [],
     subject: "",
   },
+
+  selectedProfessorIDs: [],
+  professors: [],
+  selectedProfessors: [],
 };
 
 export const { actions, reducer } = createSlice({
@@ -47,6 +59,7 @@ export const { actions, reducer } = createSlice({
     ) => {
       state.groups = payload;
     },
+
     setSelectedSubjectID: (
       state: ScheduleSliceType,
       { payload }: PayloadAction<string>
@@ -62,6 +75,29 @@ export const { actions, reducer } = createSlice({
     ) => {
       state.subjects = payload;
     },
+
+    setSelectedProfessorIDs: (
+      state: ScheduleSliceType,
+      { payload }: PayloadAction<string[]>
+    ) => {
+      state.selectedProfessorIDs = payload;
+
+      const selectedProfessors = payload.map(
+        (id) =>
+          state.professors.find(
+            (professor) => professor.id === id
+          ) as ProfessorType
+      );
+
+      state.selectedProfessors = selectedProfessors;
+    },
+    setProfessors: (
+      state: ScheduleSliceType,
+      { payload }: PayloadAction<ProfessorType[]>
+    ) => {
+      state.professors = payload;
+    },
+
     setWeek: (
       state: ScheduleSliceType,
       { payload }: PayloadAction<string[]>
@@ -75,6 +111,7 @@ export const { actions, reducer } = createSlice({
       state.weekday = payload;
     },
   },
+
   extraReducers: (builder) => {
     builder.addCase(fetchGroups.fulfilled, (state, { payload }) => {
       state.groups = payload;
@@ -85,10 +122,15 @@ export const { actions, reducer } = createSlice({
 export const {
   setGroupID,
   setGroups,
+
   setWeek,
   setWeekday,
+
   setSelectedSubjectID,
   setSubjects,
+
+  setProfessors,
+  setSelectedProfessorIDs,
 } = actions;
 
 export const scheduleReducer = reducer;

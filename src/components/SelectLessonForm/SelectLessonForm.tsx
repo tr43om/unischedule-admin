@@ -18,48 +18,21 @@ import { FormInput } from "../FormInput";
 import { useSelector } from "react-redux";
 import { selectSelectedSubject } from "../../store";
 import { SelectLessonTime } from "../SelectLessonTime";
+import { SelectProfessorField } from "../SelectProfessorField";
+import { AuditoryFields } from "../AuditoryFields";
 
 const SelectLessonForm = () => {
-  const { professors } = useSelector(selectSelectedSubject);
-  const {
-    handleSubmit,
-    control,
-    formState: { isSubmitSuccessful },
-  } = useForm<{ auditory: string }>({
-    defaultValues: {
-      auditory: "",
-    },
-
-    mode: "onChange",
-  });
   return (
     <Box>
       <Typography>Добавить новую пару</Typography>
       <Paper elevation={4} sx={{ p: 3 }}>
-        <Stack flexDirection="row" justifyItems="center" alignItems="center">
-          <SelectSubjectField />
-          <TableContainer component={Stack} sx={{ maxWidth: 300 }}>
-            <Table size="small">
-              <TableBody>
-                {professors &&
-                  professors.map((professor) => (
-                    <TableRow key={professor}>
-                      <TableCell align="left">{professor} </TableCell>
-                      <TableCell align="left">
-                        <FormInput
-                          name="auditory"
-                          control={control}
-                          placeholder="Кабинет"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
+        <Stack gap={4}>
+          <Stack flexDirection="row" gap={4}>
+            <SelectSubjectField />
+            <SelectProfessorField />
+          </Stack>
+          <AuditoryFields />
           <SelectLessonTime />
-
           <IconButton size="large">
             <AddBoxIcon />
           </IconButton>

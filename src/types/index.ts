@@ -8,3 +8,9 @@ export type SelectType = {
   label: string;
   id: string;
 };
+
+export type ProfessorType = {
+  name: string;
+  faculties: string[];
+  id: string;
+};
