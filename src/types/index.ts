@@ -14,3 +14,15 @@ export type ProfessorType = {
   faculties: string[];
   id: string;
 };
+
+export type FormValues = {
+  groupID: string;
+  weeks: string[];
+  weekday: string;
+  professorsAndAuditories: Array<{
+    auditory: string;
+    professor: string;
+  }>;
+  subject: string;
+  start: Date;
+};

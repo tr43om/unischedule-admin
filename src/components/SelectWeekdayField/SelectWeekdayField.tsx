@@ -6,10 +6,16 @@ import { useSelector } from "react-redux";
 import { FormControl } from "@mui/material";
 import { selectWeekday, setWeekday, useAppDispatch } from "../../store";
 import InputLabel from "@mui/material/InputLabel";
+import { FormValues } from "../../types";
+import { Control, Controller } from "react-hook-form";
+import { weekdays } from "../../constants";
 
-const SelectWeekdayField = () => {
+type SelectWeekdayFieldProps = {
+  control: Control<FormValues>;
+};
+
+const SelectWeekdayField = ({ control }: SelectWeekdayFieldProps) => {
   const weekday = useSelector(selectWeekday);
-  const weekdays = ["понедельник", "вторник", "среда", "четверг", "пятница"];
   const dispatch = useAppDispatch();
 
   const onWeekSelect = (event: SelectChangeEvent<string>) => {
@@ -21,19 +27,27 @@ const SelectWeekdayField = () => {
   return (
     <FormControl>
       <InputLabel id="weekday-select">День недели</InputLabel>
-      <Select
-        value={weekday || ""}
-        onChange={onWeekSelect}
-        label="День недели"
-        placeholder="День недели"
-        labelId="weekday-select"
-      >
-        {weekdays.map((weekday, i) => (
-          <MenuItem key={i} value={weekday}>
-            {weekday}
-          </MenuItem>
-        ))}
-      </Select>
+      <Controller
+        name="weekday"
+        control={control}
+        render={({ field: { value, onChange } }) => (
+          <Select
+            value={value}
+            onChange={(event: SelectChangeEvent<string>) =>
+              onChange(event.target.value)
+            }
+            label="День недели"
+            placeholder="День недели"
+            labelId="weekday-select"
+          >
+            {weekdays.map((weekday, i) => (
+              <MenuItem key={i} value={weekday}>
+                {weekday}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
+      />
     </FormControl>
   );
 };

@@ -9,3 +9,11 @@ export const MenuProps = {
     },
   },
 };
+
+export const weekdays = [
+  "понедельник",
+  "вторник",
+  "среда",
+  "четверг",
+  "пятница",
+];

@@ -2,40 +2,27 @@ import React from "react";
 import Paper from "@mui/material/Paper";
 import { SelectSubjectField } from "../SelectSubjectField";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import {
-  IconButton,
-  Stack,
-  Typography,
-  Box,
-  TableContainer,
-  TableBody,
-  TableRow,
-  TableCell,
-  Table,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
-import { FormInput } from "../FormInput";
-import { useSelector } from "react-redux";
-import { selectSelectedSubject } from "../../store";
+import { IconButton, Stack, Typography, Box } from "@mui/material";
+import { Control } from "react-hook-form";
 import { SelectLessonTime } from "../SelectLessonTime";
 import { SelectProfessorField } from "../SelectProfessorField";
-import { AuditoryFields } from "../AuditoryFields";
+import { FormValues } from "../../types";
 
-const SelectLessonForm = () => {
+type SelectLessonFieldProps = {
+  control: Control<FormValues>;
+};
+
+const SelectLessonForm = ({ control }: SelectLessonFieldProps) => {
   return (
     <Box>
       <Typography>Добавить новую пару</Typography>
       <Paper elevation={4} sx={{ p: 3 }}>
         <Stack gap={4}>
           <Stack flexDirection="row" gap={4}>
-            <SelectSubjectField />
-            <SelectProfessorField />
+            <SelectSubjectField control={control} />
+            <SelectLessonTime control={control} />
           </Stack>
-          <AuditoryFields />
-          <SelectLessonTime />
-          <IconButton size="large">
-            <AddBoxIcon />
-          </IconButton>
+          <SelectProfessorField control={control} />
         </Stack>
       </Paper>
     </Box>

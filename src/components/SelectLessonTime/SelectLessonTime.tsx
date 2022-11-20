@@ -3,40 +3,59 @@ import React, { useState } from "react";
 // date-fns
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { StaticTimePicker } from "@mui/x-date-pickers/StaticTimePicker";
 import { TextField } from "@mui/material";
 import ru from "date-fns/esm/locale/ru/index.js";
 import { Stack } from "@mui/system";
+import { FormValues } from "../../types";
+import { Control, Controller } from "react-hook-form";
+import format from "date-fns/format";
+import addMinutes from "date-fns/addMinutes";
+import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
+import isValid from "date-fns/isValid";
 
-const SelectLessonTime = () => {
+const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
   const [value, setValue] = useState<Date | null>(new Date());
   const [value2, setValue2] = useState<Date | null>(new Date());
 
   console.log(value);
   return (
-    <div>
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-        <Stack flexDirection="row" gap={3}>
-          <TimePicker
-            label="Начало"
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+      <Controller
+        control={control}
+        name="start"
+        render={({ field: { onChange, value } }) => (
+          <DesktopTimePicker
+            label="Начало пары"
             value={value}
-            onChange={(newValue) => {
-              setValue(newValue);
+            onChange={(date) => {
+              if (isValid(date)) {
+                const formatedStartDate = format(date as Date, "p", {
+                  locale: ru,
+                });
+                const formatedEndDate = format(
+                  addMinutes(date as Date, 90),
+                  "p",
+                  { locale: ru }
+                );
+
+                console.log(formatedEndDate);
+
+                onChange(formatedEndDate);
+              } else {
+                onChange(date);
+              }
             }}
             renderInput={(params) => <TextField {...params} />}
           />
-          <TimePicker
-            label="Конец"
-            value={value2}
-            onChange={(newValue) => {
-              setValue2(newValue);
-            }}
-            renderInput={(params) => <TextField {...params} />}
-          />
-        </Stack>
-      </LocalizationProvider>
-    </div>
+        )}
+      />
+    </LocalizationProvider>
   );
+};
+
+type SelectTimeFieldProps = {
+  control?: Control<FormValues>;
 };
 
 export default SelectLessonTime;

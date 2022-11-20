@@ -7,8 +7,14 @@ import { useAppDispatch } from "../../store";
 import { FormControl, Checkbox, ListItemText } from "@mui/material";
 import { MenuProps } from "../../constants";
 import InputLabel from "@mui/material/InputLabel";
+import { FormValues } from "../../types";
+import { Control, Controller } from "react-hook-form";
 
-const SelectWeekField = () => {
+type SelectWeekFieldProps = {
+  control: Control<FormValues>;
+};
+
+const SelectWeekField = ({ control }: SelectWeekFieldProps) => {
   const week = useSelector(selectWeek);
   const weeks = Array(18)
     .fill("0")
@@ -25,27 +31,34 @@ const SelectWeekField = () => {
   return (
     <FormControl>
       <InputLabel id="week-select">Недели</InputLabel>
-
-      <Select
-        multiple
-        id="week-select"
-        value={week || []}
-        onChange={onWeekSelect}
-        label="Недели"
-        renderValue={(selected) =>
-          selected.map((week) => `${week} неделя`).join(", ")
-        }
-        MenuProps={MenuProps}
-      >
-        {weeks.map((i) => {
-          return (
-            <MenuItem key={i} value={i}>
-              <Checkbox checked={week.indexOf(i) > -1} />
-              <ListItemText primary={`${i} неделя`} />
-            </MenuItem>
-          );
-        })}
-      </Select>
+      <Controller
+        name="weeks"
+        control={control}
+        render={({ field: { onChange, value }, fieldState }) => (
+          <Select
+            multiple
+            id="week-select"
+            onChange={(event: SelectChangeEvent<string[]>) =>
+              onChange(event.target.value)
+            }
+            value={value}
+            label="Недели"
+            renderValue={(selected) =>
+              selected.map((week) => `${week} неделя`).join(", ")
+            }
+            MenuProps={MenuProps}
+          >
+            {weeks.map((i) => {
+              return (
+                <MenuItem key={i} value={i}>
+                  <Checkbox checked={value.indexOf(i) > -1} />
+                  <ListItemText primary={`${i} неделя`} />
+                </MenuItem>
+              );
+            })}
+          </Select>
+        )}
+      />
     </FormControl>
   );
 };
