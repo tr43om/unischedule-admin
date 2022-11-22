@@ -17,3 +17,7 @@ export const weekdays = [
   "четверг",
   "пятница",
 ];
+
+export const weeks = Array(18)
+  .fill("0")
+  .map((_, i) => (i + 1).toString());

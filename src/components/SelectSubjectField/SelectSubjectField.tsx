@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormHelperText,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -31,12 +32,13 @@ const SelectSubjectField = ({ control }: SelectSubjectFieldProps) => {
   }, [subjectsFromFirestore, dispatch]);
 
   return (
-    <FormControl>
-      <InputLabel id="subject-select">Предмет</InputLabel>
-      <Controller
-        control={control}
-        name="subject"
-        render={({ field }) => (
+    <Controller
+      control={control}
+      name="subject"
+      render={({ field, fieldState: { error } }) => (
+        <FormControl error={!!error}>
+          <InputLabel id="subject-select">Предмет</InputLabel>
+
           <Select
             id="subject-select"
             label="Предмет"
@@ -52,9 +54,10 @@ const SelectSubjectField = ({ control }: SelectSubjectFieldProps) => {
                 );
               })}
           </Select>
-        )}
-      />
-    </FormControl>
+          <FormHelperText error={!!error}>{error?.message}</FormHelperText>
+        </FormControl>
+      )}
+    />
   );
 };
 

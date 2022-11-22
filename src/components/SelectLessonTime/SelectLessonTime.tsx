@@ -13,6 +13,8 @@ import format from "date-fns/format";
 import addMinutes from "date-fns/addMinutes";
 import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 import isValid from "date-fns/isValid";
+import FormControl from "@mui/material/FormControl/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
 
 const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
   return (
@@ -20,31 +22,34 @@ const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
       <Controller
         control={control}
         name="start"
-        render={({ field: { onChange, value } }) => (
-          <DesktopTimePicker
-            label="Начало пары"
-            value={value}
-            onChange={(date) => {
-              onChange(date);
-              // if (isValid(date)) {
-              //   const formatedStartDate = format(date as Date, "p", {
-              //     locale: ru,
-              //   });
-              //   const formatedEndDate = format(
-              //     addMinutes(date as Date, 90),
-              //     "p",
-              //     { locale: ru }
-              //   );
+        render={({ field: { onChange, value }, fieldState: { error } }) => (
+          <FormControl error={!!error}>
+            <DesktopTimePicker
+              label="Начало пары"
+              value={value}
+              onChange={(date) => {
+                onChange(date);
+                // if (isValid(date)) {
+                //   const formatedStartDate = format(date as Date, "p", {
+                //     locale: ru,
+                //   });
+                //   const formatedEndDate = format(
+                //     addMinutes(date as Date, 90),
+                //     "p",
+                //     { locale: ru }
+                //   );
 
-              //   console.log(formatedEndDate);
+                //   console.log(formatedEndDate);
 
-              //   onChange(formatedStartDate);
-              // } else {
-              //   onChange(date);
-              // }
-            }}
-            renderInput={(params) => <TextField {...params} />}
-          />
+                //   onChange(formatedStartDate);
+                // } else {
+                //   onChange(date);
+                // }
+              }}
+              renderInput={(params) => <TextField {...params} />}
+            />
+            <FormHelperText error={!!error}>{error?.message}</FormHelperText>
+          </FormControl>
         )}
       />
     </LocalizationProvider>

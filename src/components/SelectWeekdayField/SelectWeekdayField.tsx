@@ -2,9 +2,7 @@ import React from "react";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { SelectChangeEvent } from "@mui/material/Select";
-import { useSelector } from "react-redux";
-import { FormControl } from "@mui/material";
-import { selectWeekday, setWeekday, useAppDispatch } from "../../store";
+import { FormControl, FormHelperText } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import { FormValues } from "../../types";
 import { Control, Controller } from "react-hook-form";
@@ -15,22 +13,14 @@ type SelectWeekdayFieldProps = {
 };
 
 const SelectWeekdayField = ({ control }: SelectWeekdayFieldProps) => {
-  const weekday = useSelector(selectWeekday);
-  const dispatch = useAppDispatch();
-
-  const onWeekSelect = (event: SelectChangeEvent<string>) => {
-    const {
-      target: { value },
-    } = event;
-    dispatch(setWeekday(value));
-  };
   return (
-    <FormControl>
-      <InputLabel id="weekday-select">День недели</InputLabel>
-      <Controller
-        name="weekday"
-        control={control}
-        render={({ field: { value, onChange } }) => (
+    <Controller
+      name="weekday"
+      control={control}
+      render={({ field: { value, onChange }, fieldState: { error } }) => (
+        <FormControl error={!!error}>
+          <InputLabel id="weekday-select">День недели</InputLabel>
+
           <Select
             value={value}
             onChange={(event: SelectChangeEvent<string>) =>
@@ -39,6 +29,7 @@ const SelectWeekdayField = ({ control }: SelectWeekdayFieldProps) => {
             label="День недели"
             placeholder="День недели"
             labelId="weekday-select"
+            error={!!error}
           >
             {weekdays.map((weekday, i) => (
               <MenuItem key={i} value={weekday}>
@@ -46,9 +37,11 @@ const SelectWeekdayField = ({ control }: SelectWeekdayFieldProps) => {
               </MenuItem>
             ))}
           </Select>
-        )}
-      />
-    </FormControl>
+
+          <FormHelperText error={!!error}>{error?.message}</FormHelperText>
+        </FormControl>
+      )}
+    />
   );
 };
 

@@ -15,7 +15,6 @@ type SelectLessonFieldProps = {
 const SelectLessonForm = ({ control }: SelectLessonFieldProps) => {
   return (
     <Box>
-      <Typography>Добавить новую пару</Typography>
       <Paper elevation={4} sx={{ p: 3 }}>
         <Stack gap={4}>
           <Stack flexDirection="row" gap={4}>
