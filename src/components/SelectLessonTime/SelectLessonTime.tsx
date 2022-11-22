@@ -15,10 +15,6 @@ import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 import isValid from "date-fns/isValid";
 
 const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
-  const [value, setValue] = useState<Date | null>(new Date());
-  const [value2, setValue2] = useState<Date | null>(new Date());
-
-  console.log(value);
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
       <Controller
@@ -29,22 +25,23 @@ const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
             label="Начало пары"
             value={value}
             onChange={(date) => {
-              if (isValid(date)) {
-                const formatedStartDate = format(date as Date, "p", {
-                  locale: ru,
-                });
-                const formatedEndDate = format(
-                  addMinutes(date as Date, 90),
-                  "p",
-                  { locale: ru }
-                );
+              onChange(date);
+              // if (isValid(date)) {
+              //   const formatedStartDate = format(date as Date, "p", {
+              //     locale: ru,
+              //   });
+              //   const formatedEndDate = format(
+              //     addMinutes(date as Date, 90),
+              //     "p",
+              //     { locale: ru }
+              //   );
 
-                console.log(formatedEndDate);
+              //   console.log(formatedEndDate);
 
-                onChange(formatedEndDate);
-              } else {
-                onChange(date);
-              }
+              //   onChange(formatedStartDate);
+              // } else {
+              //   onChange(date);
+              // }
             }}
             renderInput={(params) => <TextField {...params} />}
           />

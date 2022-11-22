@@ -6,7 +6,7 @@ import { db } from "../../../firebase.config";
 export const fetchGroups = createAsyncThunk(
   "schedule/fetchGroups",
   async () => {
-    const scheduleRef = collection(db, "schedule");
+    const scheduleRef = collection(db, "groups");
 
     const groupsDocs = await getDocs(scheduleRef);
 

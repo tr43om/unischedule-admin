@@ -16,7 +16,11 @@ export type ProfessorType = {
 };
 
 export type FormValues = {
-  groupID: string;
+  group: {
+    id: string;
+    label: string;
+  };
+  // groupID: string;
   weeks: string[];
   weekday: string;
   professorsAndAuditories: Array<{

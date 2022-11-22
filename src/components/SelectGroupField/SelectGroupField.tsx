@@ -5,11 +5,16 @@ import { useSelector } from "react-redux";
 import { selectGroups } from "../../store/ducks/schedule/selectors";
 import { useAppDispatch } from "../../store";
 import { setGroupID } from "../../store/ducks/schedule";
-import { FormValues } from "../../types";
+import { FormValues, SelectType } from "../../types";
 
 type SelectGroupFieldProps = {
   control: Control<FormValues>;
 };
+
+const options = [
+  { label: "The Godfather", id: 1 },
+  { label: "Pulp Fiction", id: 2 },
+];
 
 const SelectGroupField = ({ control }: SelectGroupFieldProps) => {
   const groups = useSelector(selectGroups);
@@ -17,7 +22,7 @@ const SelectGroupField = ({ control }: SelectGroupFieldProps) => {
 
   return (
     <Controller
-      name="groupID"
+      name="group"
       control={control}
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <Autocomplete
@@ -34,7 +39,7 @@ const SelectGroupField = ({ control }: SelectGroupFieldProps) => {
               value={value}
               error={!!error}
               helperText={error ? error.message : ""}
-              onChange={onChange}
+              onChange={(e) => onChange(e.target.value)}
             />
           )}
         />
