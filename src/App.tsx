@@ -142,10 +142,30 @@ function App() {
   );
 }
 
+//  group: {
+//       id: "",
+//       label: "",
+//     },
+//     weeks: [],
+//     weekday: "",
+//     professorsAndAuditories: [{}],
+//     subject: "",
+//     start: new Date(),
+
 const addCourseSchema = yup.object({
   group: yup.object({
     id: yup.string(),
-    label: yup.string().required(),
+    label: yup.string().required(`Выберите группу`),
+    weeks: yup
+      .mixed()
+      .when("isArray", {
+        is: Array.isArray,
+        then: yup.array().of(yup.string()),
+        otherwise: yup.string(),
+      })
+      .required("Выберите недели"),
+    subject: yup.string().required("Выберите предмет"),
+    start: yup.date().required("Выбеите начало пары"),
   }),
 });
 
