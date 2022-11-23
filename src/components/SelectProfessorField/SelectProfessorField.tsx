@@ -70,7 +70,6 @@ const SelectProfessorField = ({ control }: SelectProfessorFieldProps) => {
         {fields.map((_, number) => (
           <Stack flexDirection="row" gap={1}>
             <FormControl>
-              <InputLabel id="professor-select">Преподаватель</InputLabel>
               <Stack flexDirection="row" gap={3}>
                 <Controller
                   name={`professorsAndAuditories.${number}.professor`}
@@ -81,6 +80,9 @@ const SelectProfessorField = ({ control }: SelectProfessorFieldProps) => {
                         !!errors?.professorsAndAuditories?.[number]?.professor
                       }
                     >
+                      <InputLabel id="professor-select">
+                        Преподаватель
+                      </InputLabel>
                       <Select
                         id="professor-select"
                         label="Преподаватель"

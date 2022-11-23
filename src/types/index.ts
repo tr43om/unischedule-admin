@@ -30,3 +30,20 @@ export type FormValues = {
   subject: string;
   start: Date;
 };
+
+export type FieldOfStudy = {
+  abbr: string;
+  name: string;
+  faculty: string;
+};
+
+export type SubjectFormValues = {
+  subject: string;
+  fieldOfStudy: string;
+};
+
+export enum RoutesPaths {
+  home = "/",
+  course = "/addcourse",
+  subject = "/addsubject",
+}

@@ -5,6 +5,7 @@ import { store } from "./store/store";
 import { Provider as StoreProvider } from "react-redux";
 import { fetchGroups } from "./store/ducks/schedule/actions";
 import { SnackbarProvider } from "notistack";
+import { BrowserRouter } from "react-router-dom";
 
 store.dispatch(fetchGroups());
 
@@ -14,9 +15,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <StoreProvider store={store}>
-      <SnackbarProvider>
-        <App />
-      </SnackbarProvider>
+      <BrowserRouter>
+        <SnackbarProvider>
+          <App />
+        </SnackbarProvider>
+      </BrowserRouter>
     </StoreProvider>
   </React.StrictMode>
 );

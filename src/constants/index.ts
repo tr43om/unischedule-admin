@@ -21,3 +21,5 @@ export const weekdays = [
 export const weeks = Array(18)
   .fill("0")
   .map((_, i) => (i + 1).toString());
+
+export const drawerWidth = 240;
