@@ -6,7 +6,6 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { useEffect } from "react";
 
 import {
   collection,
@@ -15,26 +14,35 @@ import {
   CollectionReference,
 } from "firebase/firestore";
 import { db } from "../../firebase.config";
-import { useAppDispatch, setSubjects } from "../../store";
 
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { FormValues, SubjectType } from "../../types";
-import { Control, Controller } from "react-hook-form";
+import { SubjectType } from "../../types";
+import {
+  Control,
+  Controller,
+  useController,
+  FieldValues,
+  UseControllerProps,
+} from "react-hook-form";
 
-const SelectSubjectField = ({ control }: SelectSubjectFieldProps) => {
-  const dispatch = useAppDispatch();
+const SelectSubjectField = <TFormValues extends FieldValues>({
+  control,
+  name,
+  fieldOfStudy,
+}: SelectSubjectFieldProps<TFormValues>) => {
   const ref = collection(db, "subjects") as CollectionReference<SubjectType>;
-  const q = query(ref, where("faculty", "==", "ЯПБ"));
+  const q = query(ref, where("faculty", "==", fieldOfStudy));
   const [subjectsFromFirestore] = useCollectionData(q);
 
-  useEffect(() => {
-    dispatch(setSubjects(subjectsFromFirestore || []));
-  }, [subjectsFromFirestore, dispatch]);
+  const { formState } = useController({
+    name,
+    control,
+  });
 
   return (
     <Controller
       control={control}
-      name="subject"
+      name={name}
       render={({ field, fieldState: { error } }) => (
         <FormControl error={!!error}>
           <InputLabel id="subject-select">Предмет</InputLabel>
@@ -61,8 +69,9 @@ const SelectSubjectField = ({ control }: SelectSubjectFieldProps) => {
   );
 };
 
-type SelectSubjectFieldProps = {
-  control?: Control<FormValues>;
-};
+interface SelectSubjectFieldProps<TFormValues extends FieldValues>
+  extends UseControllerProps<TFormValues> {
+  fieldOfStudy: string;
+}
 
 export default SelectSubjectField;

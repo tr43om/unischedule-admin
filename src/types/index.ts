@@ -1,3 +1,5 @@
+import { Control, FieldValues, UseControllerProps } from "react-hook-form";
+
 export type SubjectType = {
   subject: string;
   professors: string[];
@@ -15,12 +17,11 @@ export type ProfessorType = {
   id: string;
 };
 
-export type FormValues = {
+export type CourseFormValues = {
   group: {
     id: string;
     label: string;
   };
-  // groupID: string;
   weeks: string[];
   weekday: string;
   professorsAndAuditories: Array<{
@@ -39,7 +40,7 @@ export type FieldOfStudy = {
 
 export type SubjectFormValues = {
   subject: string;
-  fieldOfStudy: string;
+  fieldOfStudy: FieldOfStudy;
 };
 
 export enum RoutesPaths {
@@ -47,3 +48,9 @@ export enum RoutesPaths {
   course = "/addcourse",
   subject = "/addsubject",
 }
+
+export type FormFieldType<T extends FieldValues> = {
+  control?: Control<T>;
+  name?: string;
+  disabled?: boolean;
+};

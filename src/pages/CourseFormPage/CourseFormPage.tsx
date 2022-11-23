@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Stack from "@mui/material/Stack";
-import { FormValues } from "../../types";
+import { CourseFormValues } from "../../types";
 import {
   collection,
   addDoc,
@@ -28,7 +28,7 @@ import { useSnackbar } from "notistack";
 import { useEffect } from "react";
 const CourseFormPage = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const defaultValues: DefaultValues<FormValues> = {
+  const defaultValues: DefaultValues<CourseFormValues> = {
     group: {
       id: "",
       label: "",
@@ -46,7 +46,7 @@ const CourseFormPage = () => {
     reset,
 
     formState: { isSubmitting, isSubmitSuccessful },
-  } = useForm<FormValues>({
+  } = useForm<CourseFormValues>({
     defaultValues,
     resolver: yupResolver(addCourseSchema),
   });

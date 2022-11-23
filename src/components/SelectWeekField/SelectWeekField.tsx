@@ -8,15 +8,11 @@ import {
   SelectChangeEvent,
   FormHelperText,
 } from "@mui/material";
-import { FormValues } from "../../types";
-import { Control, Controller } from "react-hook-form";
+import { CourseFormValues, FormFieldType } from "../../types";
+import { Controller } from "react-hook-form";
 import { weeks, MenuProps } from "../../constants";
 
-type SelectWeekFieldProps = {
-  control: Control<FormValues>;
-};
-
-const SelectWeekField = ({ control }: SelectWeekFieldProps) => {
+const SelectWeekField = ({ control }: FormFieldType<CourseFormValues>) => {
   return (
     <Controller
       name="weeks"

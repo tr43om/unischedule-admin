@@ -25,20 +25,14 @@ import {
 import { db } from "../../firebase.config";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
-import { FormValues, ProfessorType } from "../../types";
+import { CourseFormValues, ProfessorType, FormFieldType } from "../../types";
 import { MenuProps } from "../../constants";
-import {
-  Control,
-  Controller,
-  useFieldArray,
-  useController,
-} from "react-hook-form";
-import { FormInput } from "../FormInput";
+import { Controller, useFieldArray, useController } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import Typography from "@mui/material/Typography";
 import FormHelperText from "@mui/material/FormHelperText";
 
-const SelectProfessorField = ({ control }: SelectProfessorFieldProps) => {
+const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "professorsAndAuditories",
@@ -172,10 +166,6 @@ const SelectProfessorField = ({ control }: SelectProfessorFieldProps) => {
       />
     </Box>
   );
-};
-
-type SelectProfessorFieldProps = {
-  control?: Control<FormValues>;
 };
 
 export default SelectProfessorField;

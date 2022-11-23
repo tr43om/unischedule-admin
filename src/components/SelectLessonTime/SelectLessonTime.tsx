@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 
 // date-fns
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { StaticTimePicker } from "@mui/x-date-pickers/StaticTimePicker";
 import { TextField } from "@mui/material";
 import ru from "date-fns/esm/locale/ru/index.js";
 import { Stack } from "@mui/system";
-import { FormValues } from "../../types";
+import { CourseFormValues, FormFieldType } from "../../types";
 import { Control, Controller } from "react-hook-form";
 import format from "date-fns/format";
 import addMinutes from "date-fns/addMinutes";
@@ -16,7 +15,7 @@ import isValid from "date-fns/isValid";
 import FormControl from "@mui/material/FormControl/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 
-const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
+const SelectLessonTime = ({ control }: FormFieldType<CourseFormValues>) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
       <Controller
@@ -54,10 +53,6 @@ const SelectLessonTime = ({ control }: SelectTimeFieldProps) => {
       />
     </LocalizationProvider>
   );
-};
-
-type SelectTimeFieldProps = {
-  control?: Control<FormValues>;
 };
 
 export default SelectLessonTime;

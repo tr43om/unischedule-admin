@@ -4,15 +4,11 @@ import MenuItem from "@mui/material/MenuItem";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { FormControl, FormHelperText } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
-import { FormValues } from "../../types";
-import { Control, Controller } from "react-hook-form";
+import { CourseFormValues, FormFieldType } from "../../types";
+import { Controller } from "react-hook-form";
 import { weekdays } from "../../constants";
 
-type SelectWeekdayFieldProps = {
-  control: Control<FormValues>;
-};
-
-const SelectWeekdayField = ({ control }: SelectWeekdayFieldProps) => {
+const SelectWeekdayField = ({ control }: FormFieldType<CourseFormValues>) => {
   return (
     <Controller
       name="weekday"

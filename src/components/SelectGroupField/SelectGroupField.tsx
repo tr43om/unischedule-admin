@@ -1,16 +1,12 @@
-import { Autocomplete, TextField } from "@mui/material";
 import React from "react";
-import { Controller, Control } from "react-hook-form";
+
+import { Autocomplete, TextField } from "@mui/material";
+import { Controller } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { selectGroups } from "../../store/ducks/schedule/selectors";
-import { FormValues } from "../../types";
-import { ErrorMessage } from "@hookform/error-message";
+import { CourseFormValues, FormFieldType } from "../../types";
 
-type SelectGroupFieldProps = {
-  control: Control<FormValues>;
-};
-
-const SelectGroupField = ({ control }: SelectGroupFieldProps) => {
+const SelectGroupField = ({ control }: FormFieldType<CourseFormValues>) => {
   const groups = useSelector(selectGroups);
 
   return (
@@ -24,7 +20,7 @@ const SelectGroupField = ({ control }: SelectGroupFieldProps) => {
       }) => (
         <Autocomplete
           disablePortal
-          id="combo-box"
+          id="select-group-box"
           options={groups}
           onChange={(e, data) => onChange(data)}
           sx={{ width: 300 }}
