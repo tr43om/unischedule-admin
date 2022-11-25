@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import { useForm, DefaultValues, Controller } from "react-hook-form";
 import { SubjectFormValues } from "../../types";
@@ -22,6 +22,15 @@ import { useSnackbar } from "notistack";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { SubjectType } from "../../types";
 import Typography from "@mui/material/Typography";
+import { useSelector } from "react-redux";
+import { selectSubjects } from "../../store/ducks/schedule/selectors";
+import {
+  InstantSearch,
+  InfiniteHits,
+  SearchBox,
+  Stats,
+  Highlight,
+} from "react-instantsearch-dom";
 
 const SubjectFormPage = () => {
   const defaultValues: DefaultValues<SubjectFormValues> = {
@@ -48,17 +57,16 @@ const SubjectFormPage = () => {
 
   const fieldOfStudyWatcher = watch("fieldOfStudy")?.abbr;
 
-  console.log(fieldOfStudyWatcher);
+  const subjects = useSelector(selectSubjects);
 
-  const subjectsCollRef = collection(
-    db,
-    "subjects"
-  ) as CollectionReference<SubjectType>;
-  const [subjects] = useCollectionData<SubjectType>(
-    query(
-      subjectsCollRef,
-      where("fieldOfStudy", "==", fieldOfStudyWatcher || "")
-    )
+  const subjectsCollRef = collection(db, "subjects");
+
+  const subjectsOfFOF = useMemo(
+    () =>
+      subjects.filter(
+        (subject) => subject.fieldOfStudy === fieldOfStudyWatcher
+      ),
+    [subjects, fieldOfStudyWatcher]
   );
 
   // console.log(subjects);
@@ -107,13 +115,14 @@ const SubjectFormPage = () => {
             <TextField {...field} label="Введите название предмета" />
           )}
         />
+
         <Button type="submit" onClick={addSubject} variant="contained">
           Добавить новый предмет
         </Button>
       </Stack>
       {subjects?.length !== 0 && (
         <Stack>
-          {subjects?.map((subj) => (
+          {subjectsOfFOF?.map((subj) => (
             <Typography key={subj.subject}>{subj.subject}</Typography>
           ))}
         </Stack>

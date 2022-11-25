@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SelectType, SubjectType, ProfessorType } from "../../../types";
-import { fetchGroups } from "./actions";
+import { fetchGroups, fetchSubjects } from "./actions";
+import { client } from "../../../ms.config";
 
 type ScheduleSliceType = {
   groupID: string;
@@ -115,6 +116,11 @@ export const { actions, reducer } = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchGroups.fulfilled, (state, { payload }) => {
       state.groups = payload;
+    });
+
+    builder.addCase(fetchSubjects.fulfilled, (state, { payload }) => {
+      state.subjects = payload || [];
+      client.index("subjects").addDocuments(state.subjects); // add documents to meillisearch index
     });
   },
 });

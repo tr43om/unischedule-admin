@@ -7,32 +7,27 @@ import {
   Select,
 } from "@mui/material";
 
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import {
-  collection,
-  where,
-  query,
-  CollectionReference,
-} from "firebase/firestore";
-import { db } from "../../firebase.config";
-
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { SubjectType } from "../../types";
-import {
-  Control,
   Controller,
   useController,
   FieldValues,
   UseControllerProps,
 } from "react-hook-form";
+import { selectSubjects } from "../../store";
 
 const SelectSubjectField = <TFormValues extends FieldValues>({
   control,
   name,
   fieldOfStudy,
 }: SelectSubjectFieldProps<TFormValues>) => {
-  const ref = collection(db, "subjects") as CollectionReference<SubjectType>;
-  const q = query(ref, where("faculty", "==", fieldOfStudy));
-  const [subjectsFromFirestore] = useCollectionData(q);
+  const subjects = useSelector(selectSubjects);
+
+  const subjectsOfFOF = useMemo(
+    () => subjects.filter((subject) => subject.fieldOfStudy === fieldOfStudy),
+    [subjects, fieldOfStudy]
+  );
 
   const { formState } = useController({
     name,
@@ -53,8 +48,8 @@ const SelectSubjectField = <TFormValues extends FieldValues>({
             sx={{ minWidth: 150 }}
             {...field}
           >
-            {subjectsFromFirestore &&
-              subjectsFromFirestore.map(({ subject }, i) => {
+            {subjectsOfFOF &&
+              subjectsOfFOF.map(({ subject }, i) => {
                 return (
                   <MenuItem key={i} value={subject}>
                     <ListItemText primary={subject} />
