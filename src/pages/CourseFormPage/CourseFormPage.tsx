@@ -67,6 +67,7 @@ const CourseFormPage = () => {
               <CloseIcon />
             </IconButton>
           ),
+          variant: "success",
         }
       );
       reset();
@@ -113,7 +114,6 @@ const CourseFormPage = () => {
       }
     } catch (error) {
       enqueueSnackbar("Произошла ошибка! Попробуйте еще раз...");
-      console.log(error);
     }
   });
   return (

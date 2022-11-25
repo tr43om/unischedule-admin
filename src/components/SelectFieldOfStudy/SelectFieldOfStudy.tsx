@@ -4,7 +4,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { collection, CollectionReference } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { FieldOfStudy, SubjectFormValues } from "../../types";
-import { Controller } from "react-hook-form";
+import { Controller, useController, useFormState } from "react-hook-form";
 
 import { TextField, Autocomplete } from "@mui/material";
 import { FormFieldType } from "../../types";
@@ -15,6 +15,14 @@ const SelectFieldOfStudy = ({ control }: FormFieldType<SubjectFormValues>) => {
     "fieldsOfStudy"
   ) as CollectionReference<FieldOfStudy>;
   const [fieldsOfStudy] = useCollectionData(fieldsOfStudyRef);
+  const {
+    field,
+    fieldState: {},
+    formState: {},
+  } = useController({
+    control,
+    name: "fieldOfStudy",
+  });
 
   return (
     <Controller

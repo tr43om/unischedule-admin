@@ -30,8 +30,8 @@ const initialState: ScheduleSliceType = {
   selectedSubjectID: "",
   subjects: [],
   selectedSubject: {
-    id: "",
-    professors: [],
+    faculty: "",
+    fieldOfStudy: "",
     subject: "",
   },
 

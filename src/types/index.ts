@@ -2,8 +2,9 @@ import { Control, FieldValues, UseControllerProps } from "react-hook-form";
 
 export type SubjectType = {
   subject: string;
-  professors: string[];
-  id: string;
+  fieldOfStudy: string;
+  faculty: string;
+  id?: string;
 };
 
 export type SelectType = {
