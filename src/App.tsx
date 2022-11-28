@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { CourseFormPage, HomePage, LayoutPage, SubjectFormPage } from "./pages";
 import { RoutesPaths } from "./types";
-import { InstantSearch } from "react-instantsearch-hooks-web";
 
 function App() {
   return (

@@ -3,9 +3,21 @@ import React, { useMemo } from "react";
 import { useForm, DefaultValues, Controller } from "react-hook-form";
 import { SubjectFormValues } from "../../types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { SelectFieldOfStudy, SelectSubjectField } from "../../components";
+import {
+  SelectFieldOfStudy,
+  SelectSubjectField,
+  SubjectCard,
+} from "../../components";
 import * as yup from "yup";
-import { Box, Button, FormControl, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  List,
+  TextField,
+  useAutocomplete,
+} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import { useEffect } from "react";
 import { FieldOfStudy } from "../../types";
@@ -24,13 +36,9 @@ import { SubjectType } from "../../types";
 import Typography from "@mui/material/Typography";
 import { useSelector } from "react-redux";
 import { selectSubjects } from "../../store/ducks/schedule/selectors";
-import {
-  InstantSearch,
-  InfiniteHits,
-  SearchBox,
-  Stats,
-  Highlight,
-} from "react-instantsearch-dom";
+import { InstantSearch } from "react-instantsearch-hooks-web";
+import { searchClient } from "../../ms.config";
+import Input from "@mui/material/Input";
 
 const SubjectFormPage = () => {
   const defaultValues: DefaultValues<SubjectFormValues> = {
@@ -73,10 +81,6 @@ const SubjectFormPage = () => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  useEffect(() => {
-    console.log(touchedFields);
-  }, [touchedFields]);
-
   const addSubject = handleSubmit(
     async ({ fieldOfStudy: { abbr, faculty, name }, subject }) => {
       const subjectQuery = query(
@@ -104,29 +108,77 @@ const SubjectFormPage = () => {
       }
     }
   );
+
+  const {
+    getRootProps,
+    getInputLabelProps,
+    getInputProps,
+    getListboxProps,
+    getOptionProps,
+    groupedOptions,
+  } = useAutocomplete({
+    id: "use-autocomplete-subjects",
+    options: subjectsOfFOF,
+    getOptionLabel: (option) => option.subject,
+  });
+
+  const isHitsVisible =
+    getInputProps() && (getInputProps().value as string).length >= 1;
+
+  const isButtonDisabled =
+    (getInputProps().value as string).length <= 1 ||
+    groupedOptions.length === 0;
+
+  console.log(fieldOfStudyWatcher);
+
   return (
     <Stack gap={4}>
       <SelectFieldOfStudy control={control} />
-      <Stack flexDirection="row" gap={2}>
-        <Controller
-          control={control}
-          name="subject"
-          render={({ field }) => (
-            <TextField {...field} label="Введите название предмета" />
-          )}
-        />
-
-        <Button type="submit" onClick={addSubject} variant="contained">
-          Добавить новый предмет
-        </Button>
+      <Stack gap={2}>
+        <div {...getRootProps()}>
+          <Controller
+            control={control}
+            name="subject"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                {...getInputProps()}
+                disabled={fieldOfStudyWatcher === undefined}
+                variant="outlined"
+                placeholder="Название предмета..."
+                size="medium"
+                color="primary"
+              />
+            )}
+          />
+        </div>
       </Stack>
-      {subjects?.length !== 0 && (
-        <Stack>
-          {subjectsOfFOF?.map((subj) => (
-            <Typography key={subj.subject}>{subj.subject}</Typography>
-          ))}
-        </Stack>
-      )}
+      <Box component="ul" sx={{ flexGrow: 1 }} {...getListboxProps()}>
+        <Grid container spacing={3}>
+          {isHitsVisible &&
+            (groupedOptions as typeof subjectsOfFOF).map((option, index) => (
+              <Grid
+                component="li"
+                item
+                xl={6}
+                sx={{ listStyle: "none", maxWidth: "300px" }}
+                {...getOptionProps({ option, index })}
+                onClick={() => console.log(option)}
+              >
+                <SubjectCard index={index} option={option} />
+                {/* {option.subject} */}
+              </Grid>
+            ))}
+        </Grid>
+      </Box>
+      <Button
+        type="submit"
+        onClick={addSubject}
+        variant="contained"
+        disabled={isButtonDisabled}
+      >
+        Добавить новый предмет
+      </Button>
     </Stack>
   );
 };
