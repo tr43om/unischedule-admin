@@ -1,0 +1,1 @@
+export {default as SubjectHits} from './SubjectHits'

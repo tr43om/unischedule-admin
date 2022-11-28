@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SubjectType } from "../../types";
 import {
   Card,
@@ -6,10 +6,21 @@ import {
   CardHeader,
   IconButton,
   Menu,
+  MenuList,
   MenuItem,
+  CardActions,
+  Avatar,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  List,
+  Box,
+  Paper,
+  ClickAwayListener,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
 
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 type SubjectCardType = {
@@ -18,36 +29,63 @@ type SubjectCardType = {
 };
 
 const SubjectCard = ({ index, option }: SubjectCardType) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [openMenu, setOpenMenu] = React.useState<boolean>(false);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const toggleMenu = (event: React.MouseEvent) => {
+    setOpenMenu((prev) => !prev);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleClickAway = () => {
+    setOpenMenu(false);
   };
+
   return (
-    <Card>
+    <Card sx={{ overflow: "unset" }}>
       <CardHeader
         title={option.subject}
+        titleTypographyProps={{ fontSize: 20 }}
+        avatar={<Avatar>{index + 1}</Avatar>}
         action={
-          <>
-            <IconButton onClick={handleClick}>
+          <Box position="relative">
+            <IconButton onClick={toggleMenu}>
               <MoreVertIcon />
             </IconButton>
-            <Menu onClose={handleClose} open={open} anchorEl={anchorEl}>
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>My account</MenuItem>
-              <MenuItem onClick={handleClose}>Logout</MenuItem>
-            </Menu>
-          </>
+            {/* <IconButton size="small">
+              <EditIcon />
+            </IconButton>
+
+            <IconButton size="small" color="error">
+              <DeleteOutlineIcon />
+            </IconButton> */}
+            {openMenu && (
+              <ClickAwayListener
+                mouseEvent="onMouseDown"
+                touchEvent="onTouchStart"
+                onClickAway={handleClickAway}
+              >
+                <MenuList
+                  sx={{ position: "absolute", zIndex: 999 }}
+                  component={Paper}
+                >
+                  <MenuItem>
+                    <ListItemIcon>
+                      <EditIcon />
+                    </ListItemIcon>
+                    <ListItemText>Редактировать</ListItemText>
+                  </MenuItem>
+                  <MenuItem>
+                    <ListItemIcon color="error">
+                      <DeleteOutlineIcon />
+                    </ListItemIcon>
+                    <ListItemText>Удалить</ListItemText>
+                  </MenuItem>
+                </MenuList>
+              </ClickAwayListener>
+            )}
+          </Box>
         }
       />
-      <CardContent>
-        <Typography>{option.subject}</Typography>
-      </CardContent>
+      <CardActions sx={{ display: "flex", marginLeft: "auto" }}></CardActions>
     </Card>
   );
 };

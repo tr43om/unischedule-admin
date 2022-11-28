@@ -12,6 +12,7 @@ import * as yup from "yup";
 import {
   Box,
   Button,
+  Container,
   FormControl,
   Grid,
   List,
@@ -127,33 +128,46 @@ const SubjectFormPage = () => {
 
   const isButtonDisabled =
     (getInputProps().value as string).length <= 1 ||
-    groupedOptions.length === 0;
+    groupedOptions.length !== 0;
 
   console.log(fieldOfStudyWatcher);
 
   return (
     <Stack gap={4}>
       <SelectFieldOfStudy control={control} />
-      <Stack gap={2}>
-        <div {...getRootProps()}>
-          <Controller
-            control={control}
-            name="subject"
-            render={({ field }) => (
-              <TextField
-                {...field}
-                {...getInputProps()}
-                disabled={fieldOfStudyWatcher === undefined}
-                variant="outlined"
-                placeholder="Название предмета..."
-                size="medium"
-                color="primary"
-              />
-            )}
-          />
-        </div>
+
+      <Stack {...getRootProps()} flexDirection="row" gap={2}>
+        <Controller
+          control={control}
+          name="subject"
+          render={({ field }) => (
+            <TextField
+              {...field}
+              {...getInputProps()}
+              disabled={fieldOfStudyWatcher === undefined}
+              variant="outlined"
+              placeholder="Название предмета..."
+              size="medium"
+              color="primary"
+              fullWidth
+            />
+          )}
+        />
+        <Button
+          type="submit"
+          onClick={addSubject}
+          variant="contained"
+          disabled={isButtonDisabled}
+        >
+          Добавить
+        </Button>
       </Stack>
-      <Box component="ul" sx={{ flexGrow: 1 }} {...getListboxProps()}>
+
+      <Box
+        component="ul"
+        sx={{ flexGrow: 1, background: "red", height: "100vh" }}
+        {...getListboxProps()}
+      >
         <Grid container spacing={3}>
           {isHitsVisible &&
             (groupedOptions as typeof subjectsOfFOF).map((option, index) => (
@@ -161,6 +175,8 @@ const SubjectFormPage = () => {
                 component="li"
                 item
                 xl={6}
+                md={6}
+                sm={12}
                 sx={{ listStyle: "none", maxWidth: "300px" }}
                 {...getOptionProps({ option, index })}
                 onClick={() => console.log(option)}
@@ -171,14 +187,6 @@ const SubjectFormPage = () => {
             ))}
         </Grid>
       </Box>
-      <Button
-        type="submit"
-        onClick={addSubject}
-        variant="contained"
-        disabled={isButtonDisabled}
-      >
-        Добавить новый предмет
-      </Button>
     </Stack>
   );
 };
