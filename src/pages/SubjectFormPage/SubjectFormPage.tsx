@@ -1,26 +1,13 @@
-import React, { useMemo } from "react";
-
-import { useForm, DefaultValues, Controller } from "react-hook-form";
-import { SubjectFormValues } from "../../types";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  SelectFieldOfStudy,
-  SelectSubjectField,
-  SubjectCard,
-} from "../../components";
 import * as yup from "yup";
-import {
-  Box,
-  Button,
-  FormControl,
-  Grid,
-  List,
-  TextField,
-  useAutocomplete,
-} from "@mui/material";
+
+import React, { useMemo } from "react";
+import { useForm, DefaultValues, Controller } from "react-hook-form";
+import { SubjectFormValues, SubjectType } from "../../types";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { SelectFieldOfStudy, SubjectCard } from "../../components";
+import { Button, Grid, TextField, useAutocomplete } from "@mui/material";
 import Stack from "@mui/material/Stack";
-import { useEffect } from "react";
-import { FieldOfStudy } from "../../types";
+
 import {
   addDoc,
   collection,
@@ -31,14 +18,13 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { useSnackbar } from "notistack";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { SubjectType } from "../../types";
-import Typography from "@mui/material/Typography";
+
 import { useSelector } from "react-redux";
 import { selectSubjects } from "../../store/ducks/schedule/selectors";
-import { InstantSearch } from "react-instantsearch-hooks-web";
-import { searchClient } from "../../ms.config";
-import Input from "@mui/material/Input";
+import {
+  useCollectionData,
+  useCollection,
+} from "react-firebase-hooks/firestore";
 
 const SubjectFormPage = () => {
   const defaultValues: DefaultValues<SubjectFormValues> = {
@@ -56,28 +42,44 @@ const SubjectFormPage = () => {
     formState: { touchedFields },
     getFieldState,
     trigger,
+
     watch,
   } = useForm<SubjectFormValues>({
     defaultValues,
+
     resolver: yupResolver(addSubjectSchema),
     mode: "onChange",
   });
 
   const fieldOfStudyWatcher = watch("fieldOfStudy")?.abbr;
+  const subjectValue = watch("subject").toLowerCase();
 
-  const subjects = useSelector(selectSubjects);
+  // const subjects = useSelector(selectSubjects);
 
-  const subjectsCollRef = collection(db, "subjects");
-
-  const subjectsOfFOF = useMemo(
-    () =>
-      subjects.filter(
-        (subject) => subject.fieldOfStudy === fieldOfStudyWatcher
-      ),
-    [subjects, fieldOfStudyWatcher]
+  const subjectsCollRef = collection(
+    db,
+    "subjects"
+  ) as CollectionReference<SubjectType>;
+  const subjectsQuery = query(
+    subjectsCollRef,
+    where("fieldOfStudy", "==", fieldOfStudyWatcher || "")
   );
 
-  // console.log(subjects);
+  const [subjectsFromFirestore] = useCollection(subjectsQuery);
+
+  const subjectsHits = useMemo(
+    () =>
+      subjectsFromFirestore?.docs
+        .map((doc) => {
+          return { ...doc.data(), id: doc.id };
+        })
+        .filter(
+          ({ subject, fieldOfStudy }) =>
+            fieldOfStudy === fieldOfStudyWatcher &&
+            subject.toLowerCase().includes(subjectValue)
+        ),
+    [fieldOfStudyWatcher, subjectValue, subjectsFromFirestore?.docs]
+  );
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -104,81 +106,58 @@ const SubjectFormPage = () => {
             variant: "success",
           }
         );
-        resetField("subject");
+        // resetField("subject");
       }
     }
   );
 
-  const {
-    getRootProps,
-    getInputLabelProps,
-    getInputProps,
-    getListboxProps,
-    getOptionProps,
-    groupedOptions,
-  } = useAutocomplete({
-    id: "use-autocomplete-subjects",
-    options: subjectsOfFOF,
-    getOptionLabel: (option) => option.subject,
-  });
+  const isHitsVisible = subjectValue.length >= 1;
 
-  const isHitsVisible =
-    getInputProps() && (getInputProps().value as string).length >= 1;
-
-  const isButtonDisabled =
-    (getInputProps().value as string).length <= 1 ||
-    groupedOptions.length === 0;
-
-  console.log(fieldOfStudyWatcher);
+  const isButtonDisabled = subjectsHits?.length !== 0;
 
   return (
     <Stack gap={4}>
       <SelectFieldOfStudy control={control} />
-      <Stack gap={2}>
-        <div {...getRootProps()}>
-          <Controller
-            control={control}
-            name="subject"
-            render={({ field }) => (
-              <TextField
-                {...field}
-                {...getInputProps()}
-                disabled={fieldOfStudyWatcher === undefined}
-                variant="outlined"
-                placeholder="Название предмета..."
-                size="medium"
-                color="primary"
-              />
-            )}
-          />
-        </div>
+      <Stack gap={2} flexDirection="row">
+        <Controller
+          control={control}
+          name="subject"
+          render={({ field }) => (
+            <TextField
+              {...field}
+              disabled={fieldOfStudyWatcher === undefined}
+              variant="outlined"
+              placeholder="Название предмета..."
+              size="medium"
+              color="primary"
+              fullWidth
+            />
+          )}
+        />
+        <Button
+          type="submit"
+          onClick={addSubject}
+          variant="contained"
+          disabled={isButtonDisabled}
+        >
+          Добавить
+        </Button>
       </Stack>
-      <Box component="ul" sx={{ flexGrow: 1 }} {...getListboxProps()}>
-        <Grid container spacing={3}>
-          {isHitsVisible &&
-            (groupedOptions as typeof subjectsOfFOF).map((option, index) => (
-              <Grid
-                component="li"
-                item
-                xl={6}
-                sx={{ listStyle: "none", maxWidth: "300px" }}
-                {...getOptionProps({ option, index })}
-                onClick={() => console.log(option)}
-              >
-                <SubjectCard index={index} option={option} />
-                {/* {option.subject} */}
-              </Grid>
-            ))}
-        </Grid>
-      </Box>
-      <Button
-        type="submit"
-        onClick={addSubject}
-        variant="contained"
-        disabled={isButtonDisabled}
-      >
-        Добавить новый предмет
-      </Button>
+
+      <Grid container spacing={3}>
+        {isHitsVisible &&
+          subjectsHits?.map((option, index) => (
+            <Grid
+              component="li"
+              item
+              xl={6}
+              sx={{ listStyle: "none", maxWidth: "300px" }}
+              onClick={() => console.log(option)}
+            >
+              <SubjectCard index={index} option={option} />
+            </Grid>
+          ))}
+      </Grid>
     </Stack>
   );
 };
