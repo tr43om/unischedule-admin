@@ -6,11 +6,17 @@ import {
   CardHeader,
   IconButton,
   Menu,
+  MenuList,
   MenuItem,
-  ListItemIcon,
-  Input,
+  CardActions,
   ListItem,
+  ListItemIcon,
   ListItemText,
+  List,
+  Box,
+  Paper,
+  ClickAwayListener,
+  Input,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -20,7 +26,6 @@ import Avatar from "@mui/material/Avatar";
 import * as _ from "lodash";
 import { collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
 import { useSnackbar } from "notistack";
 
 type SubjectCardType = {
@@ -37,10 +42,6 @@ const SubjectCard = ({ index, option }: SubjectCardType) => {
   const { enqueueSnackbar } = useSnackbar();
   const open = Boolean(anchorEl);
   const subjectRef = doc(collection(db, "subjects"), option.id);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const deleteSubject = async () => {
     await deleteDoc(subjectRef);
@@ -63,8 +64,13 @@ const SubjectCard = ({ index, option }: SubjectCardType) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
   return (
-    <Card>
+    <Card sx={{ overflow: "unset" }}>
       <CardHeader
         title={
           <>
