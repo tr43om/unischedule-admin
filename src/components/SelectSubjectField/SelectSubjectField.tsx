@@ -14,25 +14,24 @@ import {
   useController,
   FieldValues,
   UseControllerProps,
+  useWatch,
 } from "react-hook-form";
 import { selectSubjects } from "../../store";
+import { CourseFormValues } from "../../types";
 
 const SelectSubjectField = <TFormValues extends FieldValues>({
   control,
   name,
-  fieldOfStudy,
-}: SelectSubjectFieldProps<TFormValues>) => {
+}: SelectSubjectFieldProps<CourseFormValues>) => {
   const subjects = useSelector(selectSubjects);
+  const { group } = useWatch({ control });
+
+  const fof = group?.label?.split("-")[0];
 
   const subjectsOfFOF = useMemo(
-    () => subjects.filter((subject) => subject.fieldOfStudy === fieldOfStudy),
-    [subjects, fieldOfStudy]
+    () => subjects.filter((subject) => subject.fieldOfStudy === fof),
+    [subjects, fof]
   );
-
-  const { formState } = useController({
-    name,
-    control,
-  });
 
   return (
     <Controller
@@ -65,8 +64,6 @@ const SelectSubjectField = <TFormValues extends FieldValues>({
 };
 
 interface SelectSubjectFieldProps<TFormValues extends FieldValues>
-  extends UseControllerProps<TFormValues> {
-  fieldOfStudy: string;
-}
+  extends UseControllerProps<TFormValues> {}
 
 export default SelectSubjectField;

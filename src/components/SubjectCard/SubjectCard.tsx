@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { SubjectType } from "../../types";
 import {
   Card,
@@ -82,6 +82,7 @@ const SubjectCard = ({ index, option }: SubjectCardType) => {
               >
                 <Input
                   value={newSubjectValue}
+                  autoFocus
                   fullWidth
                   onKeyDown={({ key }) =>
                     key === "Enter" ? updateSubject() : null
@@ -90,7 +91,12 @@ const SubjectCard = ({ index, option }: SubjectCardType) => {
                 />
               </ClickAwayListener>
             ) : (
-              option.subject
+              <Typography
+                onDoubleClick={editSubject}
+                sx={{ userSelect: "none" }}
+              >
+                {option.subject}
+              </Typography>
             )}
           </>
         }

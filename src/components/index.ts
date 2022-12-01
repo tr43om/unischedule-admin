@@ -6,3 +6,4 @@ export * from "./SelectFieldOfStudy";
 export * from "./NavigationDrawer";
 export * from "./SelectSubjectField";
 export * from "./SubjectCard";
+export * from "./ScheduleList";

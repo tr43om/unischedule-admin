@@ -36,13 +36,7 @@ const SubjectFormPage = () => {
   const {
     handleSubmit,
     control,
-    getValues,
-    reset,
-    resetField,
     formState: { touchedFields },
-    getFieldState,
-    trigger,
-
     watch,
   } = useForm<SubjectFormValues>({
     defaultValues,
@@ -53,8 +47,6 @@ const SubjectFormPage = () => {
 
   const fieldOfStudyWatcher = watch("fieldOfStudy")?.abbr;
   const subjectValue = watch("subject").toLowerCase();
-
-  // const subjects = useSelector(selectSubjects);
 
   const subjectsCollRef = collection(
     db,
@@ -106,14 +98,13 @@ const SubjectFormPage = () => {
             variant: "success",
           }
         );
-        // resetField("subject");
       }
     }
   );
 
   const isHitsVisible = subjectValue.length >= 1;
 
-  const isButtonDisabled = subjectsHits?.length !== 0;
+  const isButtonDisabled = subjectsHits?.length !== 0 || subjectValue === "";
 
   return (
     <Stack gap={4}>

@@ -23,12 +23,12 @@ const SelectGroupField = ({ control }: FormFieldType<CourseFormValues>) => {
           id="select-group-box"
           options={groups}
           onChange={(e, data) => onChange(data)}
-          sx={{ width: 300 }}
           renderInput={(params) => (
             <TextField
               {...params}
               label="Группа"
-              variant="filled"
+              variant="outlined"
+              fullWidth
               value={value}
               error={!!error}
               helperText={error ? errors.group?.label?.message : ""}
