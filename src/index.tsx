@@ -8,7 +8,7 @@ import { SnackbarProvider } from "notistack";
 import { BrowserRouter } from "react-router-dom";
 
 store.dispatch(fetchGroups());
-store.dispatch(fetchSubjects());
+// store.dispatch(fetchSubjects());
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

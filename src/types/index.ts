@@ -1,4 +1,5 @@
 import { Control, FieldValues, UseControllerProps } from "react-hook-form";
+import { Timestamp } from "@firebase/firestore";
 
 export type SubjectType = {
   subject: string;
@@ -18,6 +19,20 @@ export type ProfessorType = {
   id: string;
 };
 
+export type ScheduleType = {
+  weekday: string;
+  professorsAndAuditories: {
+    auditory: string;
+    professor: {
+      name: string;
+      id: string;
+    };
+  }[];
+  subject: string;
+  lessonStarts: Timestamp;
+  lessonEnds: Timestamp;
+};
+
 export type CourseFormValues = {
   group: {
     id: string;
@@ -27,7 +42,10 @@ export type CourseFormValues = {
   weekday: string;
   professorsAndAuditories: Array<{
     auditory: string;
-    professor: string;
+    professor: {
+      name: string;
+      id: string;
+    };
   }>;
   subject: string;
   start: Date;

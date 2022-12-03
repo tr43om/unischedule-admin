@@ -31,6 +31,7 @@ import { Controller, useFieldArray, useController } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import Typography from "@mui/material/Typography";
 import FormHelperText from "@mui/material/FormHelperText";
+import { Autocomplete } from "@mui/material";
 
 const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
   const { fields, append, remove } = useFieldArray({
@@ -51,12 +52,14 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
     db,
     "professors"
   ) as CollectionReference<ProfessorType>;
-  const q = query(ref, where("faculties", "array-contains", "ЯПБ"));
-  const [professorsFromFirestore] = useCollectionData(q);
 
-  useEffect(() => {
-    dispatch(setProfessors(professorsFromFirestore || []));
-  }, [professorsFromFirestore, dispatch]);
+  const [professorsFromFirestore] = useCollectionData(ref);
+
+  console.log(professorsFromFirestore);
+
+  // useEffect(() => {
+  //   dispatch(setProfessors(professorsFromFirestore || []));
+  // }, [professorsFromFirestore, dispatch]);
 
   return (
     <Box>
@@ -64,48 +67,50 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
         {fields.map((_, number) => (
           <Stack flexDirection="row" gap={1}>
             <FormControl>
-              <Stack flexDirection="row" gap={3}>
+              <Stack gap={3}>
                 <Controller
                   name={`professorsAndAuditories.${number}.professor`}
                   control={control}
-                  render={({ field, formState: { errors } }) => (
+                  render={({
+                    field: { value, onChange },
+                    formState: { errors },
+                  }) => (
                     <FormControl
                       error={
                         !!errors?.professorsAndAuditories?.[number]?.professor
                       }
                     >
-                      <InputLabel id="professor-select">
-                        Преподаватель
-                      </InputLabel>
-                      <Select
-                        id="professor-select"
-                        label="Преподаватель"
-                        sx={{ minWidth: 150 }}
-                        MenuProps={MenuProps}
-                        error={
-                          !!errors?.professorsAndAuditories?.[number]?.professor
+                      <Autocomplete
+                        disablePortal
+                        freeSolo={true}
+                        id="select-professor-box"
+                        options={professorsFromFirestore || []}
+                        onChange={(e, data) => onChange(data)}
+                        getOptionLabel={(option) =>
+                          typeof option === "string" ? option : option.name
                         }
-                        {...field}
-                      >
-                        {professorsFromFirestore &&
-                          professorsFromFirestore.map(({ id, name }, i) => {
-                            return (
-                              <MenuItem key={i} value={id}>
-                                <ListItemText primary={name} />
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
-                      <FormHelperText
-                        error={
-                          !!errors?.professorsAndAuditories?.[number]?.professor
+                        isOptionEqualToValue={(option, value) =>
+                          option.name === value.name
                         }
-                      >
-                        {
-                          errors?.professorsAndAuditories?.[number]?.professor
-                            ?.message
-                        }
-                      </FormHelperText>
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Преподаватель"
+                            variant="outlined"
+                            fullWidth
+                            value={value}
+                            error={
+                              !!errors?.professorsAndAuditories?.[number]
+                                ?.professor
+                            }
+                            helperText={
+                              errors?.professorsAndAuditories?.[number]
+                                ?.professor?.message
+                            }
+                            onChange={(e) => onChange(e.target.value)}
+                          />
+                        )}
+                      />
                     </FormControl>
                   )}
                 />
@@ -150,7 +155,9 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
         ))}
       </Stack>
       <Button
-        onClick={() => append({ auditory: "", professor: "" })}
+        onClick={() =>
+          append({ auditory: "", professor: { id: "", name: "" } })
+        }
         sx={{ mt: 3 }}
       >
         Добавить преподавателя

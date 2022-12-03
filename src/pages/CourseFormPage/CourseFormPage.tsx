@@ -10,7 +10,6 @@ import {
 import { useForm, DefaultValues, useWatch } from "react-hook-form";
 import { FormControl, Button } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import CloseIcon from "@mui/icons-material/Close";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Stack from "@mui/material/Stack";
@@ -18,9 +17,21 @@ import { CourseFormValues } from "../../types";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { useSnackbar } from "notistack";
+import {
+  weeksToDays,
+  addWeeks,
+  subDays,
+  differenceInBusinessDays,
+  addDays,
+  parse,
+  add,
+  addMinutes,
+} from "date-fns";
+
+import ru from "date-fns/locale/ru";
 
 const CourseFormPage = () => {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const defaultValues: DefaultValues<CourseFormValues> = {
     group: {
       id: "",
@@ -28,7 +39,15 @@ const CourseFormPage = () => {
     },
     weeks: [],
     weekday: "",
-    professorsAndAuditories: [{}],
+    professorsAndAuditories: [
+      {
+        auditory: "",
+        professor: {
+          id: "",
+          name: "",
+        },
+      },
+    ],
     subject: "",
     start: new Date(new Date().setHours(0, 0, 0, 0)),
   };
@@ -42,58 +61,83 @@ const CourseFormPage = () => {
     resolver: yupResolver(addCourseSchema),
   });
 
-  const { group, weekday, weeks } = useWatch({ control });
+  const { group, weekday } = useWatch({ control });
 
   const isAddCourseFormVisible =
     group?.label && weekday && weekday.length !== 0;
 
-  const addCourse = handleSubmit(async (data) => {
-    const groupRef = doc(collection(db, "schedule"), data.group.id);
-    const courseRef = (week: string) =>
-      collection(db, `schedule/${data.group.id}/week_${week}`);
-    const successMessage = `Пара ${data.subject} добавлена для группы ${
-      data.group.label
-    } на ${data.weekday.slice(0, -1) + "у"} для ${
-      data.weeks.length > 1 ? "недель" : "недели"
-    } `;
+  const addCourse = handleSubmit(
+    async ({
+      group,
+      weekday,
+      weeks,
+      subject,
+      professorsAndAuditories,
+      start,
+    }) => {
+      const groupRef = doc(collection(db, "schedule"), group.id);
+      const courseRef = (week: string) =>
+        collection(db, `schedule/${group.id}/week_${week}`);
+      const successMessage = `Пара "${subject}" добавлена для группы ${group.label} `;
 
-    try {
-      await setDoc(groupRef, {
-        id: data.group.id,
-        group: data.group.label,
-      });
-
-      await data.weeks.forEach((week) =>
-        addDoc(courseRef(week), {
-          subject: data.subject,
-          weekday: data.weekday,
-        })
+      const startOfAcademicYear = new Date(
+        `Sep 1, ${new Date().getFullYear()}`
       );
 
-      enqueueSnackbar(successMessage, {
-        action: (snackbarId) => (
-          <IconButton onClick={() => closeSnackbar(snackbarId)} color="primary">
-            <CloseIcon />
-          </IconButton>
-        ),
-        variant: "success",
+      const academicWeek = subDays(
+        addWeeks(startOfAcademicYear, parseInt(weeks[0])),
+        10
+      );
+
+      const academicDay = parse(weekday, "eeee", academicWeek, {
+        locale: ru,
       });
-    } catch (error) {
-      enqueueSnackbar("Произошла ошибка! Попробуйте еще раз...");
+
+      const lessonStarts = add(academicDay, {
+        hours: start.getHours(),
+        minutes: start.getMinutes(),
+      });
+
+      const lessonEnds = addMinutes(lessonStarts, 95);
+
+      const scheduleData = {
+        subject,
+        professorsAndAuditories,
+        weekday,
+        lessonStarts,
+        lessonEnds,
+      };
+
+      try {
+        await setDoc(groupRef, {
+          id: group.id,
+          group: group.label,
+        });
+
+        weeks.forEach(
+          async (week) =>
+            await addDoc(courseRef(week), { ...scheduleData, week })
+        );
+
+        enqueueSnackbar(successMessage, {
+          variant: "success",
+        });
+      } catch (error) {
+        enqueueSnackbar("Что-то пошло не так. Попробуйте еще раз...", {
+          variant: "error",
+        });
+      }
     }
-  });
+  );
   return (
     <Container>
       <FormControl fullWidth variant="filled" sx={{ m: 1 }}>
-        <FormLabel sx={{ mb: 3 }}>
-          Заполните поля ниже, чтобы добавить новую пару
-        </FormLabel>
         <Stack spacing={3} sx={{ mb: 3 }}>
           <SelectGroupField control={control} />
           <SelectWeekField control={control} />
           <SelectWeekdayField control={control} />
-          {isAddCourseFormVisible && <SelectLessonForm control={control} />}
           <ScheduleList control={control} />
+          {isAddCourseFormVisible && <SelectLessonForm control={control} />}
         </Stack>
 
         <LoadingButton
@@ -124,7 +168,9 @@ const addCourseSchema = yup.object({
     .of(
       yup.object().shape({
         auditory: yup.string().min(1, "Заполните номер аудитории"),
-        professor: yup.string().min(1, "Выберите преподавателя"),
+        professor: yup.object().shape({
+          name: yup.string().min(1, "Выберите преподавателя"),
+        }),
       })
     )
     .min(1, "Добавьте хотя бы одного преподавателя"),

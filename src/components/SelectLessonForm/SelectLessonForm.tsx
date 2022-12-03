@@ -1,7 +1,7 @@
 import React from "react";
 import Paper from "@mui/material/Paper";
 import { SelectSubjectField } from "../SelectSubjectField";
-import { Stack, Box } from "@mui/material";
+import { Stack, Box, FormLabel, Typography } from "@mui/material";
 import { SelectLessonTime } from "../SelectLessonTime";
 import { SelectProfessorField } from "../SelectProfessorField";
 import { CourseFormValues, FormFieldType } from "../../types";
@@ -9,9 +9,12 @@ import { CourseFormValues, FormFieldType } from "../../types";
 const SelectLessonForm = ({ control }: FormFieldType<CourseFormValues>) => {
   return (
     <Box>
+      <Typography sx={{ mb: 2 }} variant="h6">
+        Заполните поля ниже, чтобы добавить новую пару
+      </Typography>
       <Paper elevation={4} sx={{ p: 3 }}>
         <Stack gap={4}>
-          <Stack flexDirection="row" gap={4}>
+          <Stack gap={4}>
             <SelectSubjectField control={control} name="subject" />
             <SelectLessonTime control={control} />
           </Stack>

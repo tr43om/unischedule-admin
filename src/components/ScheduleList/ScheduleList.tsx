@@ -1,7 +1,7 @@
 import React from "react";
 import { FormFieldType, CourseFormValues } from "../../types";
 
-import { useWatch } from "react-hook-form";
+import { useWatch, useController, useFormState } from "react-hook-form";
 import {
   doc,
   collection,
@@ -13,17 +13,39 @@ import {
 import { db } from "../../firebase.config";
 import { useEffect } from "react";
 import { useState } from "react";
+import { Card, CardHeader, Stack } from "@mui/material";
+import { ScheduleType } from "../../types";
+import { ScheduleCard } from "../ScheduleCard";
+import format from "date-fns/format";
+import { ru } from "date-fns/locale";
+import { Swiper, SwiperSlide } from "swiper/react";
+import {
+  Navigation,
+  Pagination,
+  Scrollbar,
+  A11y,
+  EffectFade,
+  EffectCoverflow,
+} from "swiper";
+import { nanoid } from "nanoid";
+
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import { ScheduleListActions } from "../ScheduleListActions";
+import { EffectCards } from "swiper";
+import "swiper/css/effect-cards";
+import "swiper/css/pagination";
 
 const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
   const { group, weekday, weeks } = useWatch({
     control,
   });
 
-  const [schedule, setSchedule] = useState<
-    {
-      subject: string;
-    }[]
-  >([]);
+  const { isSubmitted } = useFormState({
+    control,
+  });
+
+  const [schedule, setSchedule] = useState<ScheduleType[]>([]);
 
   useEffect(() => {
     if (!weeks || !weekday || !group) return;
@@ -34,18 +56,39 @@ const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
             query(
               collection(db, `schedule/${group.id}/week_${week}`),
               where("weekday", "==", weekday)
-            ) as Query<{ subject: string }>
+            ) as Query<ScheduleType>
           ).then(({ docs }) => docs.map((doc) => doc.data()));
         })
       ).then((data) => data.flat());
       setSchedule(schedule);
     })();
-  }, [group, weekday, weeks]);
+  }, [group, weekday, weeks, isSubmitted]);
 
   return (
-    <div>
-      <div>{schedule && schedule.map((sch) => <div>{sch.subject}</div>)}</div>
-    </div>
+    <Swiper
+      modules={[
+        Navigation,
+        Pagination,
+        Scrollbar,
+        A11y,
+        EffectFade,
+        EffectCards,
+        EffectCoverflow,
+      ]}
+      grabCursor={true}
+      spaceBetween={50}
+      slidesPerView={2}
+      pagination={{ clickable: true }}
+    >
+      {schedule &&
+        schedule.map((sch) => (
+          <SwiperSlide key={nanoid()}>
+            <ScheduleCard schedule={sch} />
+          </SwiperSlide>
+        ))}
+
+      <ScheduleListActions />
+    </Swiper>
   );
 };
 

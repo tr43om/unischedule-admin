@@ -3,6 +3,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, getDocs, CollectionReference } from "firebase/firestore";
 import { db } from "../../../firebase.config";
 import { SubjectType } from "../../../types";
+import chalk from "chalk";
 
 export const fetchGroups = createAsyncThunk(
   "schedule/fetchGroups",
@@ -10,6 +11,8 @@ export const fetchGroups = createAsyncThunk(
     const groupsRef = collection(db, "groups");
 
     const groupsDocs = await getDocs(groupsRef);
+
+    console.log(chalk.bgCyan("FETCH GROUPS"));
 
     const groups = groupsDocs.docs.map((doc) => {
       return { label: doc.data().name, id: doc.id };

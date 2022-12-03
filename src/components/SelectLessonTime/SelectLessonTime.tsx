@@ -28,23 +28,10 @@ const SelectLessonTime = ({ control }: FormFieldType<CourseFormValues>) => {
               value={value}
               onChange={(date) => {
                 onChange(date);
-                // if (isValid(date)) {
-                //   const formatedStartDate = format(date as Date, "p", {
-                //     locale: ru,
-                //   });
-                //   const formatedEndDate = format(
-                //     addMinutes(date as Date, 90),
-                //     "p",
-                //     { locale: ru }
-                //   );
-
-                //   console.log(formatedEndDate);
-
-                //   onChange(formatedStartDate);
-                // } else {
-                //   onChange(date);
-                // }
               }}
+              minTime={new Date().setHours(8)}
+              maxTime={new Date().setHours(20)}
+              minutesStep={5}
               renderInput={(params) => <TextField {...params} />}
             />
             <FormHelperText error={!!error}>{error?.message}</FormHelperText>

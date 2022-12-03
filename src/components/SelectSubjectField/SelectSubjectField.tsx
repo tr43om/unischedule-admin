@@ -17,21 +17,36 @@ import {
   useWatch,
 } from "react-hook-form";
 import { selectSubjects } from "../../store";
-import { CourseFormValues } from "../../types";
+import { CourseFormValues, SubjectType } from "../../types";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { db } from "../../firebase.config";
+import {
+  collection,
+  CollectionReference,
+  query,
+  where,
+} from "firebase/firestore";
 
 const SelectSubjectField = <TFormValues extends FieldValues>({
   control,
   name,
 }: SelectSubjectFieldProps<CourseFormValues>) => {
-  const subjects = useSelector(selectSubjects);
+  // const subjects = useSelector(selectSubjects);
   const { group } = useWatch({ control });
 
   const fof = group?.label?.split("-")[0];
 
-  const subjectsOfFOF = useMemo(
-    () => subjects.filter((subject) => subject.fieldOfStudy === fof),
-    [subjects, fof]
-  );
+  // const subjectsOfFOF = useMemo(
+  //   () => subjects.filter((subject) => subject.fieldOfStudy === fof),
+  //   [subjects, fof]
+  // );
+
+  const subjectsRef = collection(
+    db,
+    "subjects"
+  ) as CollectionReference<SubjectType>;
+  const subjectsQuery = query(subjectsRef, where("fieldOfStudy", "==", fof));
+  const [subjects] = useCollectionData(subjectsQuery);
 
   return (
     <Controller
@@ -47,8 +62,8 @@ const SelectSubjectField = <TFormValues extends FieldValues>({
             sx={{ minWidth: 150 }}
             {...field}
           >
-            {subjectsOfFOF &&
-              subjectsOfFOF.map(({ subject }, i) => {
+            {subjects &&
+              subjects.map(({ subject }, i) => {
                 return (
                   <MenuItem key={i} value={subject}>
                     <ListItemText primary={subject} />
