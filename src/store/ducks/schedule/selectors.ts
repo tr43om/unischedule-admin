@@ -6,6 +6,11 @@ export const selectGroups = createSelector(
   (groups) => groups
 );
 
+export const selectCurrentSchedule = createSelector(
+  ({ schedule: { currentSchedule } }: RootState) => currentSchedule,
+  (currentSchedule) => currentSchedule
+);
+
 export const selectProfessors = createSelector(
   ({ schedule: { professors } }: RootState) => professors,
   (professors) => professors
@@ -21,32 +26,7 @@ export const selectProfessorIDs = createSelector(
   (selectedProfessorIDs) => selectedProfessorIDs
 );
 
-export const selectSubjectID = createSelector(
-  ({ schedule: { selectedSubjectID } }: RootState) => selectedSubjectID,
-  (selectedSubjectID) => selectedSubjectID
-);
-
-export const selectSelectedSubject = createSelector(
-  ({ schedule: { selectedSubject } }: RootState) => selectedSubject,
-  (selectedSubject) => selectedSubject
-);
-
 export const selectSubjects = createSelector(
   ({ schedule: { subjects } }: RootState) => subjects,
   (subjects) => subjects
-);
-
-export const selectWeek = createSelector(
-  ({ schedule: { week } }: RootState) => week,
-  (week) => week
-);
-
-export const selectWeekday = createSelector(
-  ({ schedule: { weekday } }: RootState) => weekday,
-  (weekday) => weekday
-);
-
-export const selectGroupID = createSelector(
-  ({ schedule: { groupID } }: RootState) => groupID,
-  (groupID) => groupID
 );

@@ -140,16 +140,18 @@ const CourseFormPage = () => {
           {isAddCourseFormVisible && <SelectLessonForm control={control} />}
         </Stack>
 
-        <LoadingButton
-          type="submit"
-          loading={isSubmitting}
-          variant="contained"
-          sx={{ maxWidth: "200px" }}
-          onClick={addCourse}
-          disabled={isSubmitting}
-        >
-          Добавить
-        </LoadingButton>
+        {isAddCourseFormVisible && (
+          <LoadingButton
+            type="submit"
+            loading={isSubmitting}
+            variant="contained"
+            sx={{ maxWidth: "200px" }}
+            onClick={addCourse}
+            disabled={isSubmitting}
+          >
+            Добавить
+          </LoadingButton>
+        )}
       </FormControl>
     </Container>
   );

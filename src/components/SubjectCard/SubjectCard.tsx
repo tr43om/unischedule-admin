@@ -2,28 +2,21 @@ import React, { useRef, useState } from "react";
 import { SubjectType } from "../../types";
 import {
   Card,
-  CardContent,
   CardHeader,
   IconButton,
   Menu,
-  MenuList,
   MenuItem,
-  CardActions,
-  ListItem,
   ListItemIcon,
   ListItemText,
-  List,
-  Box,
-  Paper,
   ClickAwayListener,
   Input,
+  Typography,
 } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditIcon from "@mui/icons-material/Edit";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Avatar from "@mui/material/Avatar";
-import * as _ from "lodash";
+import {
+  DeleteOutline as DeleteOutlineIcon,
+  MoreVert as MoreVertIcon,
+  Edit as EditIcon,
+} from "@mui/icons-material";
 import { collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { useSnackbar } from "notistack";

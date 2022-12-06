@@ -9,9 +9,6 @@ import { CourseFormValues, FormFieldType } from "../../types";
 const SelectLessonForm = ({ control }: FormFieldType<CourseFormValues>) => {
   return (
     <Box>
-      <Typography sx={{ mb: 2 }} variant="h6">
-        Заполните поля ниже, чтобы добавить новую пару
-      </Typography>
       <Paper elevation={4} sx={{ p: 3 }}>
         <Stack gap={4}>
           <Stack gap={4}>

@@ -31,6 +31,18 @@ export type ScheduleType = {
   subject: string;
   lessonStarts: Timestamp;
   lessonEnds: Timestamp;
+  id: string;
+};
+export type SubjectUpdateValues = {
+  professorsAndAuditories: Array<{
+    auditory: string;
+    professor: {
+      name: string;
+      id: string;
+    };
+  }>;
+  subject: string;
+  start: Date;
 };
 
 export type CourseFormValues = {
@@ -66,6 +78,7 @@ export enum RoutesPaths {
   home = "/",
   course = "/addcourse",
   subject = "/addsubject",
+  scheduleDetails = "/addcourse/:id",
 }
 
 export type FormFieldType<T extends FieldValues> = {
