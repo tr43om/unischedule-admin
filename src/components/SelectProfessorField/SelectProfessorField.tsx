@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 
-import { setProfessors, useAppDispatch } from "../../store";
+import { useAppDispatch } from "../../store";
 
 import {
   collection,
@@ -46,20 +46,12 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
     name: "professorsAndAuditories",
   });
 
-  const dispatch = useAppDispatch();
-
   const ref = collection(
     db,
     "professors"
   ) as CollectionReference<ProfessorType>;
 
   const [professorsFromFirestore] = useCollectionData(ref);
-
-  console.log(professorsFromFirestore);
-
-  // useEffect(() => {
-  //   dispatch(setProfessors(professorsFromFirestore || []));
-  // }, [professorsFromFirestore, dispatch]);
 
   return (
     <Box>
@@ -85,6 +77,7 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
                         freeSolo={true}
                         id="select-professor-box"
                         options={professorsFromFirestore || []}
+                        value={value}
                         onChange={(e, data) => onChange(data)}
                         getOptionLabel={(option) =>
                           typeof option === "string" ? option : option.name

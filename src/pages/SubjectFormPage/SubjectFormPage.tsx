@@ -5,7 +5,7 @@ import { useForm, DefaultValues, Controller } from "react-hook-form";
 import { SubjectFormValues, SubjectType } from "../../types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SelectFieldOfStudy, SubjectCard } from "../../components";
-import { Button, Grid, TextField, useAutocomplete } from "@mui/material";
+import { Button, Grid, TextField } from "@mui/material";
 import Stack from "@mui/material/Stack";
 
 import {

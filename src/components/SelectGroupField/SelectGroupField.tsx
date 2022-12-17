@@ -3,11 +3,22 @@ import React from "react";
 import { Autocomplete, TextField } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { selectGroups } from "../../store/ducks/schedule/selectors";
-import { CourseFormValues, FormFieldType } from "../../types";
+import {
+  selectGroups,
+  currentGroupSelector,
+} from "../../store/ducks/schedule/selectors";
+import { selectCurrentGroup } from "../../store";
+import { useAppDispatch } from "../../store";
+import { CourseFormValues, FormFieldType, SelectType } from "../../types";
 
 const SelectGroupField = ({ control }: FormFieldType<CourseFormValues>) => {
   const groups = useSelector(selectGroups);
+  const dispatch = useAppDispatch();
+  const currentGroup = useSelector(currentGroupSelector);
+
+  if (!groups) {
+    return <div>loading...</div>;
+  }
 
   return (
     <Controller
@@ -22,7 +33,12 @@ const SelectGroupField = ({ control }: FormFieldType<CourseFormValues>) => {
           disablePortal
           id="select-group-box"
           options={groups}
-          onChange={(e, data) => onChange(data)}
+          value={currentGroup || ""}
+          onChange={(e, data) => {
+            if (!data) return;
+            onChange(data);
+            dispatch(selectCurrentGroup(data || ({} as SelectType)));
+          }}
           renderInput={(params) => (
             <TextField
               {...params}

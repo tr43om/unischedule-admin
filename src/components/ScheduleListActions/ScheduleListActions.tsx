@@ -22,7 +22,7 @@ const ScheduleListActions = ({ activeSlide = 1 }: ScheduleListActionsProps) => {
   const swipe = useSwiper();
   const scheduleLength = useSelector(selectCurrentSchedule)?.length;
 
-  const count = Math.ceil(scheduleLength / slidesPerView);
+  const count = Math.floor(scheduleLength / slidesPerView) + 1;
 
   if (!count) return null;
 

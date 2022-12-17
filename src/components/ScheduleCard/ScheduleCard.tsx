@@ -21,7 +21,6 @@ export type ScheduleCardProps = {
 };
 
 const ScheduleCard = ({ schedule }: ScheduleCardProps) => {
-  const slide = useSwiperSlide();
   const start = schedule.lessonStarts.toDate().toLocaleTimeString("en-GB", {
     hour: "2-digit",
     minute: "2-digit",

@@ -7,8 +7,13 @@ import InputLabel from "@mui/material/InputLabel";
 import { CourseFormValues, FormFieldType } from "../../types";
 import { Controller } from "react-hook-form";
 import { weekdays } from "../../constants";
+import { currentWeekdaySelector, useAppDispatch } from "../../store";
+import { selectCurrentWeekday } from "../../store";
+import { useSelector } from "react-redux";
 
 const SelectWeekdayField = ({ control }: FormFieldType<CourseFormValues>) => {
+  const dispatch = useAppDispatch();
+  const currentWeekday = useSelector(currentWeekdaySelector);
   return (
     <Controller
       name="weekday"
@@ -18,10 +23,11 @@ const SelectWeekdayField = ({ control }: FormFieldType<CourseFormValues>) => {
           <InputLabel id="weekday-select">День недели</InputLabel>
 
           <Select
-            value={value}
-            onChange={(event: SelectChangeEvent<string>) =>
-              onChange(event.target.value)
-            }
+            value={currentWeekday}
+            onChange={(event: SelectChangeEvent<string>) => {
+              onChange(event.target.value);
+              dispatch(selectCurrentWeekday(event.target.value));
+            }}
             label="День недели"
             placeholder="День недели"
             labelId="weekday-select"

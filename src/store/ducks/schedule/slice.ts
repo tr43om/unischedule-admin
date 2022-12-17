@@ -10,6 +10,10 @@ import { fetchGroups, fetchSubjects } from "./actions";
 type ScheduleSliceType = {
   groups: SelectType[];
 
+  currentGroup: SelectType;
+  currentWeeks: string[];
+  currentWeekday: string;
+
   subjects: SubjectType[];
 
   selectedProfessorIDs: string[];
@@ -30,26 +34,25 @@ export const { actions, reducer } = createSlice({
       state.currentSchedule = payload;
     },
 
-    setSelectedProfessorIDs: (
+    selectCurrentGroup: (
+      state: ScheduleSliceType,
+      { payload }: PayloadAction<SelectType>
+    ) => {
+      state.currentGroup = payload;
+    },
+
+    selectCurrentWeeks: (
       state: ScheduleSliceType,
       { payload }: PayloadAction<string[]>
     ) => {
-      state.selectedProfessorIDs = payload;
-
-      const selectedProfessors = payload.map(
-        (id) =>
-          state.professors.find(
-            (professor) => professor.id === id
-          ) as ProfessorType
-      );
-
-      state.selectedProfessors = selectedProfessors;
+      state.currentWeeks = payload;
     },
-    setProfessors: (
+
+    selectCurrentWeekday: (
       state: ScheduleSliceType,
-      { payload }: PayloadAction<ProfessorType[]>
+      { payload }: PayloadAction<string>
     ) => {
-      state.professors = payload;
+      state.currentWeekday = payload;
     },
   },
 
@@ -64,7 +67,11 @@ export const { actions, reducer } = createSlice({
   },
 });
 
-export const { setProfessors, setSelectedProfessorIDs, setCurrentSchedule } =
-  actions;
+export const {
+  setCurrentSchedule,
+  selectCurrentGroup,
+  selectCurrentWeeks,
+  selectCurrentWeekday,
+} = actions;
 
 export const scheduleReducer = reducer;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { FormFieldType, CourseFormValues } from "../../types";
 
 import { useWatch, useController, useFormState } from "react-hook-form";
@@ -9,11 +9,19 @@ import {
   where,
   Query,
   getDocs,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Box, Card, CardHeader, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardHeader,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { ScheduleType } from "../../types";
 import { ScheduleCard } from "../ScheduleCard";
 import format from "date-fns/format";
@@ -40,6 +48,7 @@ import { useAppDispatch } from "../../store";
 import { setCurrentSchedule } from "../../store";
 import { selectCurrentSchedule } from "../../store";
 import { useSelector } from "react-redux";
+import { currentGroupSelector } from "../../store/ducks/schedule/selectors";
 
 const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
   const dispatch = useAppDispatch();
@@ -48,38 +57,50 @@ const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
     control,
   });
 
+  const disallowedToFetch = !weeks || !weekday || !group;
+  const groupID = useSelector(currentGroupSelector)?.id;
+
   const { isSubmitted } = useFormState({
     control,
   });
 
-  // const [schedule, setSchedule] = useState<ScheduleType[]>([]);
   const [activeSlide, setActiveSlide] = useState<number>(1);
 
-  useEffect(() => {
-    if (!weeks || !weekday || !group) return;
-    (async () => {
-      const schedule = await Promise.all(
-        weeks.map(async (week) => {
-          return getDocs(
-            query(
-              collection(db, `schedule/${group.id}/week_${week}`),
-              where("weekday", "==", weekday)
-            ) as Query<ScheduleType>
-          ).then(({ docs }) =>
-            docs.map((doc) => {
-              return { ...doc.data(), id: doc.id };
-            })
-          );
+  const fetchSchedule = useCallback(async () => {
+    if (disallowedToFetch) return;
+
+    console.log("FETCH SCHEDULE");
+
+    const ref = (week: string) =>
+      query(
+        collection(db, `schedule/${groupID || group.id}/week_${week}`),
+        where("weekday", "==", weekday)
+      ) as Query<ScheduleType>;
+
+    const promises = weeks.map(async (week) => {
+      return await getDocs(ref(week)).then(({ docs }) =>
+        docs.map((doc) => {
+          return { ...doc.data(), id: doc.id };
         })
-      ).then((data) => data.flat());
-      // setSchedule(schedule);
-      dispatch(setCurrentSchedule(schedule));
-    })();
-  }, [group, weekday, weeks, isSubmitted]);
+      );
+    });
+
+    const result = (await Promise.all(promises)).flat();
+
+    dispatch(setCurrentSchedule(result));
+  }, [disallowedToFetch, group?.id, groupID, weeks, dispatch, weekday]);
+
+  useEffect(() => {
+    fetchSchedule();
+  }, [fetchSchedule]);
+
+  if (!schedule) return null;
 
   return (
     <Box>
       <Typography>Найденные предметы: </Typography>
+      <Button onClick={() => fetchSchedule()}>update</Button>
+
       <Swiper
         modules={[
           Navigation,
@@ -103,6 +124,7 @@ const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
             ))}
           </>
         )}
+
         <ScheduleListActions activeSlide={activeSlide} />
       </Swiper>
     </Box>

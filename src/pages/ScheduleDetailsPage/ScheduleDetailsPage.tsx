@@ -8,14 +8,37 @@ import {
 } from "react-router-dom";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import { useSelector } from "react-redux";
-import { selectCurrentSchedule } from "../../store/ducks/schedule/selectors";
+import {
+  selectCurrentSchedule,
+  currentGroupSelector,
+  currentWeeksSelector,
+  currentWeekdaySelector,
+} from "../../store/ducks/schedule/selectors";
 import { SelectLessonForm } from "../../components";
-import { SubjectUpdateValues } from "../../types";
+import {
+  RoutesPaths,
+  ScheduleType,
+  SubjectUpdateValues,
+  CourseFormValues,
+} from "../../types";
 import { DefaultValues } from "react-hook-form/dist/types";
-import { useForm } from "react-hook-form/dist/useForm";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import {
+  collection,
+  CollectionReference,
+  doc,
+  updateDoc,
+  DocumentReference,
+} from "firebase/firestore";
+import { db } from "../../firebase.config";
+import { useEffect } from "react";
+import { redirect } from "react-router-dom";
+import { useDocumentData } from "react-firebase-hooks/firestore";
+import { addMinutes } from "date-fns";
+import { useSnackbar } from "notistack";
 
 type NavigationBackButtonProps = {
   navigate: NavigateFunction;
@@ -45,36 +68,63 @@ const ScheduleDetailsPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const schedule = useSelector(selectCurrentSchedule);
+  const group = useSelector(currentGroupSelector);
+  const weeks = useSelector(currentWeeksSelector);
+  const weekday = useSelector(currentWeekdaySelector);
+  const scheduleDetails = schedule?.find((sch) => sch.id === params.id);
+  const { enqueueSnackbar } = useSnackbar();
 
-  const defaultValues: DefaultValues<SubjectUpdateValues> = {
-    professorsAndAuditories: [
-      {
-        auditory: "",
-        professor: {
-          id: "",
-          name: "",
-        },
-      },
-    ],
-    subject: "",
-    start: new Date(new Date().setHours(0, 0, 0, 0)),
+  const shouldRedirect = !schedule || !group || !weeks || !weekday;
+
+  useEffect(() => {
+    if (shouldRedirect) navigate(RoutesPaths.course);
+  }, [shouldRedirect, navigate]);
+
+  const defaultValues: DefaultValues<CourseFormValues> = {
+    group,
+    weekday,
+    weeks,
+    professorsAndAuditories: scheduleDetails?.professorsAndAuditories,
+    subject: scheduleDetails?.subject,
+    start: scheduleDetails?.lessonStarts.toDate(),
   };
-  const {
-    handleSubmit,
-    control,
-
-    formState: { isSubmitting },
-  } = useForm<SubjectUpdateValues>({
+  const { handleSubmit, control } = useForm<CourseFormValues>({
     defaultValues,
     resolver: yupResolver(updateSubjectSchema),
   });
-  const scheduleDetails = schedule.find((sch) => sch.id === params.id);
+
+  const updateSchedule = handleSubmit(
+    async ({ start, subject, professorsAndAuditories }) => {
+      weeks.forEach(async (week) => {
+        const scheduleRef = doc(
+          db,
+          `schedule/${group?.id}/week_${week}/${params.id}`
+        );
+
+        await updateDoc(scheduleRef, {
+          subject,
+          lessonStarts: start,
+          lessonEnds: addMinutes(start, 95),
+          professorsAndAuditories,
+        });
+      });
+
+      const successMessage = `Расписание обновлено`;
+      enqueueSnackbar(successMessage, {
+        variant: "success",
+      });
+    }
+  );
+
+  // const [scheduleDetails] = useDocumentData(scheduleRef);
 
   return (
     <Box>
       <NavigationBackButton navigate={navigate} />
-      {/* <SelectLessonForm control={control} /> */}
-      {scheduleDetails && <Typography>{scheduleDetails.subject}</Typography>}
+      <SelectLessonForm control={control} />
+      <Button variant="contained" sx={{ mt: 3 }} onClick={updateSchedule}>
+        Сохранить изменения
+      </Button>
     </Box>
   );
 };
@@ -97,7 +147,7 @@ const updateSubjectSchema = yup.object({
     .date()
     .typeError("Введеное время не корректно")
     .min(
-      new Date(new Date().setHours(8, 45, 0, 0)),
+      new Date(new Date().setHours(8, 45, 0, 0)).getHours(),
       "Пара не может начаться раньше 8:45"
     )
     .required("Выберите начало пары"),

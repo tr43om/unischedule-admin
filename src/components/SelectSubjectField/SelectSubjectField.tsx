@@ -36,11 +36,6 @@ const SelectSubjectField = <TFormValues extends FieldValues>({
 
   const fof = group?.label?.split("-")[0];
 
-  // const subjectsOfFOF = useMemo(
-  //   () => subjects.filter((subject) => subject.fieldOfStudy === fof),
-  //   [subjects, fof]
-  // );
-
   const subjectsRef = collection(
     db,
     "subjects"
@@ -60,6 +55,7 @@ const SelectSubjectField = <TFormValues extends FieldValues>({
             id="subject-select"
             label="Предмет"
             sx={{ minWidth: 150 }}
+            // value={field.value}
             {...field}
           >
             {subjects &&
