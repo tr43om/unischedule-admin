@@ -29,16 +29,22 @@ import {
 } from "date-fns";
 
 import ru from "date-fns/locale/ru";
+import { useSelector } from "react-redux";
+import {
+  currentGroupSelector,
+  currentWeekdaySelector,
+  currentWeeksSelector,
+} from "../../store";
 
 const CourseFormPage = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const group = useSelector(currentGroupSelector);
+  const weekday = useSelector(currentWeekdaySelector);
+  const weeks = useSelector(currentWeeksSelector);
   const defaultValues: DefaultValues<CourseFormValues> = {
-    group: {
-      id: "",
-      label: "",
-    },
-    weeks: [],
-    weekday: "",
+    group,
+    weeks,
+    weekday,
     professorsAndAuditories: [
       {
         auditory: "",
@@ -51,6 +57,7 @@ const CourseFormPage = () => {
     subject: "",
     start: new Date(new Date().setHours(0, 0, 0, 0)),
   };
+
   const {
     handleSubmit,
     control,
@@ -61,10 +68,7 @@ const CourseFormPage = () => {
     resolver: yupResolver(addCourseSchema),
   });
 
-  const { group, weekday } = useWatch({ control });
-
-  const isAddCourseFormVisible =
-    group?.label && weekday && weekday.length !== 0;
+  const isAddCourseFormVisible = group?.label && weekday && weeks.length !== 0;
 
   const addCourse = handleSubmit(
     async ({
@@ -129,6 +133,7 @@ const CourseFormPage = () => {
       }
     }
   );
+
   return (
     <Container>
       <FormControl fullWidth variant="filled" sx={{ m: 1 }}>

@@ -5,6 +5,7 @@ import {
   LayoutPage,
   ScheduleDetailsPage,
   SubjectFormPage,
+  ProfessorFormPage,
 } from "./pages";
 import { RoutesPaths } from "./types";
 
@@ -19,6 +20,7 @@ function App() {
           path={RoutesPaths.scheduleDetails}
           element={<ScheduleDetailsPage />}
         />
+        <Route path={RoutesPaths.professor} element={<ProfessorFormPage />} />
       </Route>
     </Routes>
   );

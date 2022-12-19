@@ -98,6 +98,24 @@ const NavigationDrawer = ({ isOpen, closeDrawer }: NavigationDrawerProps) => {
             </ListItemIcon>
             <ListItemText>Предметы</ListItemText>
           </ListItemButton>
+
+          <ListItemButton
+            to={RoutesPaths.professor}
+            component={RouterNavLink}
+            sx={({ palette }) => ({
+              "&.active": {
+                color: palette.secondary.main,
+                "& > .MuiListItemIcon-root": {
+                  color: palette.secondary.main,
+                },
+              },
+            })}
+          >
+            <ListItemIcon>
+              <AddBoxIcon />
+            </ListItemIcon>
+            <ListItemText>Преподаватели</ListItemText>
+          </ListItemButton>
         </List>
       </Drawer>
     </>

@@ -16,7 +16,7 @@ import {
   UseControllerProps,
   useWatch,
 } from "react-hook-form";
-import { selectSubjects } from "../../store";
+import { currentGroupSelector, selectSubjects } from "../../store";
 import { CourseFormValues, SubjectType } from "../../types";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { db } from "../../firebase.config";
@@ -31,8 +31,7 @@ const SelectSubjectField = <TFormValues extends FieldValues>({
   control,
   name,
 }: SelectSubjectFieldProps<CourseFormValues>) => {
-  // const subjects = useSelector(selectSubjects);
-  const { group } = useWatch({ control });
+  const group = useSelector(currentGroupSelector);
 
   const fof = group?.label?.split("-")[0];
 

@@ -8,17 +8,15 @@ import { CourseFormValues, FormFieldType } from "../../types";
 
 const SelectLessonForm = ({ control }: FormFieldType<CourseFormValues>) => {
   return (
-    <Box>
-      <Paper elevation={4} sx={{ p: 3 }}>
+    <Paper sx={{ p: 3 }} variant={"outlined"}>
+      <Stack gap={4}>
         <Stack gap={4}>
-          <Stack gap={4}>
-            <SelectSubjectField control={control} name="subject" />
-            <SelectLessonTime control={control} />
-          </Stack>
-          <SelectProfessorField control={control} />
+          <SelectSubjectField control={control} name="subject" />
+          <SelectLessonTime control={control} />
         </Stack>
-      </Paper>
-    </Box>
+        <SelectProfessorField control={control} />
+      </Stack>
+    </Paper>
   );
 };
 

@@ -1,4 +1,12 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import {
   useParams,
@@ -40,6 +48,9 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import { addMinutes } from "date-fns";
 import { useSnackbar } from "notistack";
 
+import { DeleteOutline as DeleteOutlineIcon } from "@mui/icons-material";
+import { deleteDoc } from "firebase/firestore";
+
 type NavigationBackButtonProps = {
   navigate: NavigateFunction;
 };
@@ -66,13 +77,14 @@ const NavigationBackButton = ({ navigate }: NavigationBackButtonProps) => {
 
 const ScheduleDetailsPage = () => {
   const params = useParams();
+  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const schedule = useSelector(selectCurrentSchedule);
   const group = useSelector(currentGroupSelector);
   const weeks = useSelector(currentWeeksSelector);
   const weekday = useSelector(currentWeekdaySelector);
+
   const scheduleDetails = schedule?.find((sch) => sch.id === params.id);
-  const { enqueueSnackbar } = useSnackbar();
 
   const shouldRedirect = !schedule || !group || !weeks || !weekday;
 
@@ -93,20 +105,18 @@ const ScheduleDetailsPage = () => {
     resolver: yupResolver(updateSubjectSchema),
   });
 
+  const scheduleRef = doc(
+    db,
+    `schedule/${group?.id}/week_${scheduleDetails?.week}/${params.id}`
+  );
+
   const updateSchedule = handleSubmit(
     async ({ start, subject, professorsAndAuditories }) => {
-      weeks.forEach(async (week) => {
-        const scheduleRef = doc(
-          db,
-          `schedule/${group?.id}/week_${week}/${params.id}`
-        );
-
-        await updateDoc(scheduleRef, {
-          subject,
-          lessonStarts: start,
-          lessonEnds: addMinutes(start, 95),
-          professorsAndAuditories,
-        });
+      await updateDoc(scheduleRef, {
+        subject,
+        lessonStarts: start,
+        lessonEnds: addMinutes(start, 95),
+        professorsAndAuditories,
       });
 
       const successMessage = `Расписание обновлено`;
@@ -116,16 +126,35 @@ const ScheduleDetailsPage = () => {
     }
   );
 
-  // const [scheduleDetails] = useDocumentData(scheduleRef);
+  const deleteSchedule = async () => {
+    await deleteDoc(scheduleRef).then(() => navigate(-1));
+
+    const successMessage = `Расписание удалено`;
+    enqueueSnackbar(successMessage, {
+      variant: "success",
+    });
+  };
 
   return (
-    <Box>
-      <NavigationBackButton navigate={navigate} />
-      <SelectLessonForm control={control} />
-      <Button variant="contained" sx={{ mt: 3 }} onClick={updateSchedule}>
-        Сохранить изменения
-      </Button>
-    </Box>
+    <Card>
+      <CardHeader
+        title={<>{scheduleDetails?.week} неделя</>}
+        subheader={<>{scheduleDetails?.weekday}</>}
+        action={
+          <IconButton onClick={deleteSchedule}>
+            <DeleteOutlineIcon />
+          </IconButton>
+        }
+      />
+
+      <CardContent>
+        {/* <NavigationBackButton navigate={navigate} /> */}
+        <SelectLessonForm control={control} />
+        <Button variant="contained" sx={{ mt: 3 }} onClick={updateSchedule}>
+          Сохранить изменения
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
 

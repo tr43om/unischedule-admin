@@ -15,6 +15,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 
 import { Link as RouterLink } from "react-router-dom";
 import { RoutesPaths } from "../../types/index";
+import { addWeeks, subDays } from "date-fns";
 
 export type ScheduleCardProps = {
   schedule: ScheduleType;
@@ -31,6 +32,12 @@ const ScheduleCard = ({ schedule }: ScheduleCardProps) => {
     minute: "2-digit",
   });
 
+  const startOfAcademicYear = new Date(`Sep 1, ${new Date().getFullYear()}`);
+
+  const academicWeek = subDays(addWeeks(startOfAcademicYear, 2), 10);
+
+  console.log("academic week", academicWeek);
+
   const courseTime = `${schedule.weekday}, ${start} - ${end}`;
 
   return (
@@ -42,7 +49,12 @@ const ScheduleCard = ({ schedule }: ScheduleCardProps) => {
       <Card variant="elevation" elevation={3}>
         <CardHeader
           title={schedule.subject}
-          subheader={courseTime}
+          subheader={
+            <>
+              <Typography>{schedule.week} неделя</Typography>
+              <Typography>{courseTime}</Typography>
+            </>
+          }
           action={
             <IconButton>
               <LaunchIcon fontSize="small" />

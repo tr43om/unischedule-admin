@@ -7,3 +7,5 @@ export * from "./NavigationDrawer";
 export * from "./SelectSubjectField";
 export * from "./SubjectCard";
 export * from "./ScheduleList";
+export * from "./UploadButton";
+export * from "./CroppedImagePreview";

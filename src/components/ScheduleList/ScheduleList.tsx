@@ -44,21 +44,24 @@ import { EffectCards } from "swiper";
 import { slidesPerView } from "../../constants";
 import "swiper/css/effect-cards";
 import "swiper/css/pagination";
-import { useAppDispatch } from "../../store";
+import { selectCurrentWeekday, useAppDispatch } from "../../store";
 import { setCurrentSchedule } from "../../store";
 import { selectCurrentSchedule } from "../../store";
 import { useSelector } from "react-redux";
-import { currentGroupSelector } from "../../store/ducks/schedule/selectors";
+import {
+  currentGroupSelector,
+  currentWeekdaySelector,
+  currentWeeksSelector,
+} from "../../store/ducks/schedule/selectors";
 
 const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
   const dispatch = useAppDispatch();
   const schedule = useSelector(selectCurrentSchedule);
-  const { group, weekday, weeks } = useWatch({
-    control,
-  });
+  const group = useSelector(currentGroupSelector);
+  const weekday = useSelector(currentWeekdaySelector);
+  const weeks = useSelector(currentWeeksSelector);
 
   const disallowedToFetch = !weeks || !weekday || !group;
-  const groupID = useSelector(currentGroupSelector)?.id;
 
   const { isSubmitted } = useFormState({
     control,
@@ -73,7 +76,7 @@ const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
 
     const ref = (week: string) =>
       query(
-        collection(db, `schedule/${groupID || group.id}/week_${week}`),
+        collection(db, `schedule/${group.id}/week_${week}`),
         where("weekday", "==", weekday)
       ) as Query<ScheduleType>;
 
@@ -88,18 +91,17 @@ const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
     const result = (await Promise.all(promises)).flat();
 
     dispatch(setCurrentSchedule(result));
-  }, [disallowedToFetch, group?.id, groupID, weeks, dispatch, weekday]);
+  }, [disallowedToFetch, group?.id, weeks, dispatch, weekday]);
 
   useEffect(() => {
     fetchSchedule();
-  }, [fetchSchedule]);
+  }, [fetchSchedule, isSubmitted]);
 
-  if (!schedule) return null;
+  if (!schedule.length) return null;
 
   return (
     <Box>
       <Typography>Найденные предметы: </Typography>
-      <Button onClick={() => fetchSchedule()}>update</Button>
 
       <Swiper
         modules={[
