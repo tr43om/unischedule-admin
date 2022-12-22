@@ -36,7 +36,7 @@ export const getCroppedImg = async (
   pixelCrop: Area,
   rotation = 0,
   flip = { horizontal: false, vertical: false }
-): Promise<string> => {
+): Promise<File> => {
   const image = (await createImage(imageSrc)) as CanvasImageSource;
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -84,10 +84,9 @@ export const getCroppedImg = async (
     ctx.putImageData(data, 0, 0);
 
     // As Base64 string
-    // return canvas.toDataURL('image/jpeg');
     // As a blob
     canvas.toBlob((file) => {
-      resolve(URL.createObjectURL(file as Blob));
-    }, "image/jpeg");
+      resolve(file as File);
+    });
   });
 };

@@ -9,8 +9,6 @@ type CroppedImagePreviewProps = {
   size?: number;
 };
 
-const CROP_AREA_ASPECT = 1;
-
 const CroppedImagePreview = ({
   croppedArea,
   src,
@@ -41,7 +39,8 @@ const CroppedImagePreview = ({
         borderRadius: "50%",
       }}
     >
-      <Avatar
+      <Box
+        component={Image}
         sx={[
           imageStyle,
           {
@@ -49,17 +48,12 @@ const CroppedImagePreview = ({
             top: 0,
             left: 0,
             transformOrigin: "top left",
-            width: size,
-            height: size,
-            borderRadius: 0,
           },
         ]}
         src={src}
       />
     </Box>
   );
-
-  //   <Image src={src} style={imageStyle} />
 };
 
 export default CroppedImagePreview;

@@ -17,7 +17,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { UploadButton } from "../../components";
+import { UploadPFPArea } from "../../components";
 import { nanoid } from "nanoid";
 import { useState } from "react";
 
@@ -27,6 +27,8 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+import { ChooseThumbnailModal } from "../../components/ChooseThumbnailModal";
+import { LoadingButton } from "@mui/lab";
 
 const ProfessorFormPage = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -45,7 +47,7 @@ const ProfessorFormPage = () => {
   });
 
   const addProfessor = handleSubmit(
-    async ({ firstname, patronym, picture, surname }) => {
+    async ({ firstname, patronym, surname, PFP, PFPThumbnail }) => {
       try {
         const collectionRef = collection(db, "professors");
 
@@ -53,8 +55,10 @@ const ProfessorFormPage = () => {
 
         const storePicture = async (picture: File) => {
           const pictureName = `${shortname}-${nanoid()}`;
-          const storageRef = ref(storage, `images/${pictureName}`);
+          const storageRef = ref(storage, `PFP/${pictureName}`);
           const uploadTask = uploadBytesResumable(storageRef, picture);
+
+          if (!picture) return null;
 
           return new Promise((resolve, reject) => {
             uploadTask.on(
@@ -86,14 +90,16 @@ const ProfessorFormPage = () => {
           });
         };
 
-        const avatarURL = await storePicture(picture);
+        const PFP_URL = await storePicture(PFP);
+        const PFP_THUMBNAIL_URL = await storePicture(PFPThumbnail);
 
         const professor = {
           shortname,
           firstname,
           patronym,
           surname,
-          avatarURL,
+          PFP_URL,
+          PFP_THUMBNAIL_URL,
         };
 
         await addDoc(collectionRef, professor);
@@ -152,13 +158,18 @@ const ProfessorFormPage = () => {
         )}
       />
 
-      <UploadButton control={control} />
+      <UploadPFPArea control={control} />
 
       {errors.picture && <Typography>{errors.picture.message}</Typography>}
 
-      <Button type="submit" onClick={addProfessor} variant="contained">
+      <LoadingButton
+        type="submit"
+        onClick={addProfessor}
+        variant="contained"
+        loading={isSubmitting}
+      >
         Добавить
-      </Button>
+      </LoadingButton>
     </Stack>
   );
 };
@@ -167,7 +178,7 @@ const addProfessorSchema = yup.object({
   firstname: yup.string().required("Введите имя"),
   surname: yup.string().required("Введите фамилию"),
   patronym: yup.string().required("Введите отчество"),
-  picture: yup
+  PFP: yup
     .mixed()
     .notRequired()
     .test(
@@ -178,6 +189,10 @@ const addProfessorSchema = yup.object({
         return value.size <= 1000000;
       }
     ),
+  PFPThumbnail: yup.mixed().when("PFP", {
+    is: (value: File) => value.name,
+    then: yup.mixed().required("choose thumbnail"),
+  }),
 });
 
 export default ProfessorFormPage;

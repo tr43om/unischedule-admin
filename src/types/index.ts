@@ -80,6 +80,8 @@ export type ProfessorFormValues = {
   surname: string;
   patronym: string;
   picture: File;
+  PFP: File;
+  PFPThumbnail: File;
 };
 
 export enum RoutesPaths {
