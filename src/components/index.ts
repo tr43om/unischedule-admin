@@ -9,3 +9,4 @@ export * from "./SubjectCard";
 export * from "./ScheduleList";
 export * from "./UploadPFPArea";
 export * from "./CroppedImagePreview";
+export * from "./ChooseThumbnailModal";

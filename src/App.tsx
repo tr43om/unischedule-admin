@@ -8,6 +8,8 @@ import {
   ProfessorFormPage,
 } from "./pages";
 import { RoutesPaths } from "./types";
+import AddProfessorTab from "./pages/ProfessorFormPage/tabs/AddProfessorTab/AddProfessorTab";
+import UpdateProfessorTab from "./pages/ProfessorFormPage/tabs/UpdateProfessorTab/UpdateProfessorTab";
 
 function App() {
   return (
@@ -20,7 +22,10 @@ function App() {
           path={RoutesPaths.scheduleDetails}
           element={<ScheduleDetailsPage />}
         />
-        <Route path={RoutesPaths.professor} element={<ProfessorFormPage />} />
+        <Route
+          path={`${RoutesPaths.professor}/*`}
+          element={<ProfessorFormPage />}
+        ></Route>
       </Route>
     </Routes>
   );

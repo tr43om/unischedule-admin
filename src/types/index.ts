@@ -88,8 +88,10 @@ export enum RoutesPaths {
   home = "/",
   course = "/addcourse",
   subject = "/addsubject",
-  professor = "/addprofessor",
+  professor = "/professor",
   scheduleDetails = "/addcourse/:id",
+  addProfessor = "/addProfessor",
+  updateProfessor = "/updateProfessor",
 }
 
 export type FormFieldType<T extends FieldValues> = {
