@@ -1,49 +1,27 @@
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Stack from "@mui/material/Stack";
 import {
   Avatar,
-  Box,
   Card,
-  CardActions,
-  CardContent,
   CardHeader,
-  CardMedia,
   Dialog,
-  ImageListItem,
-  Input,
-  Modal,
-  Paper,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ChangeEvent, useCallback } from "react";
-import { useState } from "react";
-import Image from "mui-image";
-import { Close as CloseIcon, Delete, Edit } from "@mui/icons-material";
-import {
-  Controller,
-  Control,
-  useController,
-  useFormState,
-} from "react-hook-form";
-import { ProfessorFormValues } from "../../types";
+import { useCallback, useState } from "react";
 
-import Cropper from "react-easy-crop";
-import { Point, Area } from "react-easy-crop/types";
-import { CroppedImagePreview } from "../CroppedImagePreview";
+import { Delete, Edit } from "@mui/icons-material";
+import { Control, useController, useFormState } from "react-hook-form";
+import { ProfessorFormRequestType } from "../../types";
 
-import { useDropzone } from "react-dropzone";
 import { ChooseThumbnailModal } from "../ChooseThumbnailModal";
-import PhotoIcon from "@mui/icons-material/Photo";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+
 import { useWatch } from "react-hook-form";
+import { DropZone } from "../DropZone";
 
 type UploadPFPAreaProps = {
   label?: string;
-  control: Control<ProfessorFormValues>;
+  control: Control<ProfessorFormRequestType>;
 };
 
 const UploadPFPArea = ({
@@ -69,21 +47,15 @@ const UploadPFPArea = ({
     control,
   });
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    // Do something with the files
-    const file = acceptedFiles[0];
-    setIsThumbnailModalOpened(true);
-    storePFP(file);
-    setPFP(file);
-  }, []);
-
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isFileDialogActive,
-    isFocused,
-  } = useDropzone({ onDrop });
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      setIsThumbnailModalOpened(true);
+      storePFP(file);
+      setPFP(file);
+    },
+    [storePFP]
+  );
 
   return (
     <>
@@ -126,7 +98,9 @@ const UploadPFPArea = ({
                 </Tooltip>
               </>
             }
-            title={`${surname} ${firstname} ${patronym}`}
+            title={`${surname ? surname : ""} ${firstname ? firstname : ""} ${
+              patronym ? patronym : ""
+            }`}
           />
 
           <Dialog
@@ -137,64 +111,15 @@ const UploadPFPArea = ({
           </Dialog>
 
           <ChooseThumbnailModal
+            file={PFP}
             isOpened={isThumbnailModalOpened}
             closeModal={() => setIsThumbnailModalOpened(false)}
             control={control}
-            imgURL={URL.createObjectURL(PFP)}
           />
           <Typography>{errors && errors.PFPThumbnail?.message}</Typography>
         </Card>
       ) : (
-        <Box
-          {...getRootProps()}
-          sx={({ palette }) => ({
-            border: isDragActive ? "2px dashed gray " : "2px dashed lightgray",
-            paddingBlock: 5,
-            cursor: "pointer",
-            borderRadius: 5,
-            backgroundColor: isDragActive ? "lightgray" : "",
-          })}
-          textAlign="center"
-        >
-          <Box
-            component="input"
-            accept="image/*"
-            hidden
-            type="file"
-            {...getInputProps()}
-          />
-          <>
-            {isDragActive ? (
-              <PhotoIcon
-                sx={({ palette }) => ({
-                  fill: palette.primary.main,
-                  fontSize: 60,
-                })}
-              />
-            ) : (
-              <AddPhotoAlternateIcon
-                sx={({ palette }) => ({
-                  fill: palette.primary.main,
-                  fontSize: 60,
-                })}
-              />
-            )}
-            <Typography variant="h5" fontWeight="bold">
-              Перетащите фото преподавателя сюда <br /> или
-              <Box
-                sx={({ palette }) => ({
-                  display: "inline",
-                  color: palette.primary.main,
-                  fontWeight: "bold",
-                })}
-              >
-                {" "}
-                выберите вручную
-              </Box>
-            </Typography>
-            <Typography color="gray">jpeg, png размером до 1 МЬ</Typography>
-          </>
-        </Box>
+        <DropZone onDrop={onDrop} />
       )}
     </>
   );

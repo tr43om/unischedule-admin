@@ -10,3 +10,7 @@ export * from "./ScheduleList";
 export * from "./UploadPFPArea";
 export * from "./CroppedImagePreview";
 export * from "./ChooseThumbnailModal";
+export * from "./LinkTab";
+export * from "./ProfessorCard";
+export * from "./UpdatePFP";
+export * from "./ui";

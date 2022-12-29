@@ -1,101 +1,54 @@
 import React from "react";
 
-import { useForm, DefaultValues, useWatch, Controller } from "react-hook-form";
+import { useForm, DefaultValues, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { CourseFormValues, ProfessorFormValues } from "../../../../types";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
+import { ProfessorFormRequestType } from "../../../../types";
+import { collection, addDoc } from "firebase/firestore";
 import { db, storage } from "../../../../firebase.config";
 import { useSnackbar } from "notistack";
-import {
-  Button,
-  FormControl,
-  FormHelperText,
-  Modal,
-  Paper,
-  Stack,
-  Tab,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { UploadPFPArea, ChooseThumbnailModal } from "../../../../components";
+import { Stack, TextField } from "@mui/material";
+import { UploadPFPArea } from "../../../../components";
 import { nanoid } from "nanoid";
-import { useState } from "react";
 
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
+import { useFirestoreStorage } from "../../../../hooks/useFirestoreStorage";
+
+import { ref } from "firebase/storage";
 import { LoadingButton } from "@mui/lab";
-import { Link } from "react-router-dom";
 
 const AddProfessorTab = () => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const defaultValues: DefaultValues<ProfessorFormValues> = {};
+  const defaultValues: DefaultValues<ProfessorFormRequestType> = {};
 
   const {
     handleSubmit,
     control,
-    watch,
-    formState: { isSubmitting, errors },
-  } = useForm<ProfessorFormValues>({
+    reset,
+    formState: { isSubmitting },
+  } = useForm<ProfessorFormRequestType>({
     defaultValues,
     resolver: yupResolver(addProfessorSchema),
     mode: "onChange",
   });
+
+  const { storeFile } = useFirestoreStorage();
 
   const addProfessor = handleSubmit(
     async ({ firstname, patronym, surname, PFP, PFPThumbnail }) => {
       try {
         const collectionRef = collection(db, "professors");
 
-        const shortname = `${surname} ${firstname[0]}.${patronym[0]}.`;
+        const pfpPath = `professors/PFPs/${nanoid()}`;
+        const thumbnailPath = `professors/thumbnails/${nanoid()}`;
 
-        const storePicture = async (picture: File) => {
-          const pictureName = `${shortname}-${nanoid()}`;
-          const storageRef = ref(storage, `PFP/${pictureName}`);
-          const uploadTask = uploadBytesResumable(storageRef, picture);
-
-          if (!picture) return null;
-
-          return new Promise((resolve, reject) => {
-            uploadTask.on(
-              "state_changed",
-              (snapshot) => {
-                const progress =
-                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log("Upload is " + progress + "% done");
-                switch (snapshot.state) {
-                  case "paused":
-                    console.log("Upload is paused");
-                    break;
-                  case "running":
-                    console.log("Upload is running");
-                    break;
-                  default:
-                    return "jopa";
-                }
-              },
-              (error) => {
-                reject(error);
-              },
-              () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                  resolve(downloadURL);
-                });
-              }
-            );
-          });
-        };
-
-        const PFP_URL = await storePicture(PFP);
-        const PFP_THUMBNAIL_URL = await storePicture(PFPThumbnail);
+        const PFP_URL = await storeFile(PFP, ref(storage, pfpPath));
+        const PFP_THUMBNAIL_URL = await storeFile(
+          PFPThumbnail,
+          ref(storage, thumbnailPath)
+        );
 
         const professor = {
-          shortname,
           firstname,
           patronym,
           surname,
@@ -104,12 +57,14 @@ const AddProfessorTab = () => {
         };
 
         await addDoc(collectionRef, professor);
+        reset({ firstname, patronym, surname, PFP, PFPThumbnail });
 
-        enqueueSnackbar(`${shortname} добавлен(а) в список преподавателей`, {
-          variant: "success",
-        });
-
-        console.log(professor);
+        enqueueSnackbar(
+          `${surname} ${firstname[0]}.${patronym[0]}. добавлен(а) в список преподавателей`,
+          {
+            variant: "success",
+          }
+        );
       } catch (error) {
         enqueueSnackbar("error", {
           variant: "error",
@@ -117,6 +72,7 @@ const AddProfessorTab = () => {
       }
     }
   );
+
   return (
     <Stack gap={3}>
       <Controller
@@ -160,8 +116,6 @@ const AddProfessorTab = () => {
 
       <UploadPFPArea control={control} />
 
-      {errors.picture && <Typography>{errors.picture.message}</Typography>}
-
       <LoadingButton
         type="submit"
         onClick={addProfessor}
@@ -190,7 +144,7 @@ const addProfessorSchema = yup.object({
       }
     ),
   PFPThumbnail: yup.mixed().when("PFP", {
-    is: (value: File) => value.name,
+    is: (value: File) => value && value.name,
     then: yup.mixed().required("choose thumbnail"),
   }),
 });

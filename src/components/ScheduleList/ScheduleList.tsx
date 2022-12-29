@@ -14,14 +14,7 @@ import {
 import { db } from "../../firebase.config";
 import { useEffect } from "react";
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardHeader,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { ScheduleType } from "../../types";
 import { ScheduleCard } from "../ScheduleCard";
 import format from "date-fns/format";
@@ -97,7 +90,7 @@ const ScheduleList = ({ control }: FormFieldType<CourseFormValues>) => {
     fetchSchedule();
   }, [fetchSchedule, isSubmitted]);
 
-  if (!schedule.length) return null;
+  if (!schedule) return null;
 
   return (
     <Box>

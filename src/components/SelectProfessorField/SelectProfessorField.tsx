@@ -11,6 +11,8 @@ import {
   IconButton,
   TextField,
   InputAdornment,
+  AutocompleteCloseReason,
+  Avatar,
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -25,7 +27,12 @@ import {
 import { db } from "../../firebase.config";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
-import { CourseFormValues, ProfessorType, FormFieldType } from "../../types";
+import {
+  CourseFormValues,
+  ProfessorResponseType,
+  FormFieldType,
+  ProfessorsAndAuditoriesType,
+} from "../../types";
 import { MenuProps } from "../../constants";
 import { Controller, useFieldArray, useController } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
@@ -49,7 +56,7 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
   const ref = collection(
     db,
     "professors"
-  ) as CollectionReference<ProfessorType>;
+  ) as CollectionReference<ProfessorResponseType>;
 
   const [professorsFromFirestore] = useCollectionData(ref);
 
@@ -80,11 +87,23 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
                         value={value}
                         onChange={(e, data) => onChange(data)}
                         getOptionLabel={(option) =>
-                          typeof option === "string" ? option : option.name
+                          typeof option === "string" ? option : option.fullname
                         }
-                        isOptionEqualToValue={(option, value) =>
-                          option.name === value.name
-                        }
+                        noOptionsText="No labels"
+                        renderOption={(props, option, { selected }) => (
+                          <li {...props}>
+                            <Stack
+                              flexDirection="row"
+                              gap={1}
+                              alignItems="center"
+                            >
+                              <Avatar src={option.PFP_THUMBNAIL_URL}>
+                                {option.firstname[0]}{" "}
+                              </Avatar>
+                              <Typography>{option.shortname}</Typography>
+                            </Stack>
+                          </li>
+                        )}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -148,9 +167,7 @@ const SelectProfessorField = ({ control }: FormFieldType<CourseFormValues>) => {
         ))}
       </Stack>
       <Button
-        onClick={() =>
-          append({ auditory: "", professor: { id: "", name: "" } })
-        }
+        onClick={() => append({} as ProfessorsAndAuditoriesType)}
         sx={{ mt: 3 }}
       >
         Добавить преподавателя

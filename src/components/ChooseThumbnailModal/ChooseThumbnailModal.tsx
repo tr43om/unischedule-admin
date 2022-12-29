@@ -1,47 +1,50 @@
 import React, { useCallback, useState } from "react";
 import Cropper, { Area, Point } from "react-easy-crop";
 import { Control } from "react-hook-form/dist/types/form";
-import { ProfessorFormValues } from "../../types";
+import { ProfessorFormRequestType } from "../../types";
 import { useController } from "react-hook-form";
 import { getCroppedImg } from "./cropImage";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
-  Modal,
-  Paper,
   Stack,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { CroppedImagePreview } from "../CroppedImagePreview";
+import { LoadingButton } from "@mui/lab";
 
 type ChooseThumbnailModalProps = {
-  control: Control<ProfessorFormValues>;
-  imgURL: string;
+  control?: Control<ProfessorFormRequestType>;
   isOpened: boolean;
+  uploadPFPandThumbnail?: (newPFP: File, newThumbnail: File) => void;
+  uploading?: boolean;
   closeModal: () => void;
+  file: File;
 };
 
 const ChooseThumbnailModal = ({
   control,
-  imgURL,
   closeModal,
   isOpened,
+  file,
+  uploading,
+  uploadPFPandThumbnail,
 }: ChooseThumbnailModalProps) => {
-  //   const [file, setFile] = useState<File | null>();
-
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [cropArea, setCroppedArea] = useState<Area | null>(null);
+  const [thumbnail, setThumbnail] = useState<File>();
+
+  const PFPsrc = URL.createObjectURL(file);
 
   const {
-    field: { onChange: storePFPThumbnail },
+    field: { onChange: storeThumbnail },
   } = useController({
     control,
     name: "PFPThumbnail",
@@ -49,92 +52,104 @@ const ChooseThumbnailModal = ({
 
   const handleFileRemove = () => {
     closeModal();
-    storePFPThumbnail(undefined);
+    storeThumbnail(undefined);
   };
 
   // crop
   const onCropComplete = useCallback(
-    (croppedArea: Area, croppedAreaPixels: Area) => {
-      setCroppedAreaPixels(croppedAreaPixels);
+    async (croppedArea: Area, croppedAreaPixels: Area) => {
       setCroppedArea(croppedArea);
-    },
-    []
-  );
 
-  const getThumbnail = useCallback(async () => {
-    try {
-      if (!croppedAreaPixels) return;
       const thumbnail = await getCroppedImg(
-        imgURL,
+        PFPsrc,
         croppedAreaPixels,
         rotation
       );
 
-      storePFPThumbnail(thumbnail);
-      closeModal();
-    } catch (e) {
-      console.error(e);
+      setThumbnail(thumbnail);
+    },
+    [PFPsrc, rotation]
+  );
+
+  const uploadFiles = () => {
+    storeThumbnail(thumbnail);
+
+    if (thumbnail && uploadPFPandThumbnail) {
+      uploadPFPandThumbnail(file, thumbnail);
     }
-  }, [croppedAreaPixels, rotation, imgURL, storePFPThumbnail]);
+
+    if (!uploading) closeModal();
+  };
 
   return (
-    <Dialog open={isOpened} onClose={closeModal}>
-      <Card>
-        <CardHeader
-          action={
-            <IconButton onClick={handleFileRemove}>
-              <CloseIcon />
-            </IconButton>
-          }
-        />
+    <Dialog open={isOpened} onClose={closeModal} fullWidth>
+      <DialogTitle>
+        Выберите миниатюру
+        <DialogActions
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+          }}
+        >
+          <IconButton onClick={handleFileRemove}>
+            <CloseIcon />
+          </IconButton>
+        </DialogActions>
+      </DialogTitle>
 
-        <CardContent>
-          <Stack flexDirection="row" gap={3} alignItems="flex-end">
-            <Box
-              sx={{
-                position: "relative",
-                width: 300,
-                height: 200,
-                borderRadius: 2,
-                overflow: "hidden",
-              }}
-            >
-              <Cropper
-                image={imgURL}
-                crop={crop}
-                rotation={rotation}
-                zoom={zoom}
-                aspect={1}
-                objectFit="vertical-cover"
-                showGrid={false}
-                onCropChange={setCrop}
-                onRotationChange={setRotation}
-                onCropComplete={onCropComplete}
-                onZoomChange={setZoom}
-                cropShape="round"
+      <DialogContent>
+        <Stack flexDirection="row" gap={3} alignItems="flex-end">
+          <Box
+            sx={{
+              position: "relative",
+              width: 300,
+              height: 200,
+              borderRadius: 2,
+              overflow: "hidden",
+            }}
+          >
+            <Cropper
+              image={PFPsrc}
+              crop={crop}
+              rotation={rotation}
+              zoom={zoom}
+              aspect={1}
+              objectFit="vertical-cover"
+              showGrid={false}
+              onCropChange={setCrop}
+              onRotationChange={setRotation}
+              onCropComplete={onCropComplete}
+              onZoomChange={setZoom}
+              cropShape="round"
+            />
+          </Box>
+
+          {cropArea && (
+            <Stack>
+              <CroppedImagePreview
+                src={PFPsrc}
+                croppedArea={cropArea}
+                size={50}
               />
-            </Box>
+              <CroppedImagePreview
+                src={PFPsrc}
+                croppedArea={cropArea}
+                size={100}
+              />
+            </Stack>
+          )}
+        </Stack>
 
-            {cropArea && (
-              <Stack>
-                <CroppedImagePreview
-                  src={imgURL}
-                  croppedArea={cropArea}
-                  size={50}
-                />
-                <CroppedImagePreview
-                  src={imgURL}
-                  croppedArea={cropArea}
-                  size={100}
-                />
-              </Stack>
-            )}
-          </Stack>
-          <Button onClick={getThumbnail} variant="contained" sx={{ mt: 3 }}>
-            Сохранить
-          </Button>
-        </CardContent>
-      </Card>
+        <LoadingButton
+          loading={uploading}
+          variant="contained"
+          onClick={uploadFiles}
+          sx={{ mt: 3 }}
+        >
+          Сохранить
+        </LoadingButton>
+      </DialogContent>
     </Dialog>
   );
 };

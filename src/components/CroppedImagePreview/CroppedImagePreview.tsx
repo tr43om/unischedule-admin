@@ -1,4 +1,4 @@
-import { Avatar, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import React from "react";
 import { Area } from "react-easy-crop";
 import Image from "mui-image";
@@ -41,6 +41,7 @@ const CroppedImagePreview = ({
     >
       <Box
         component={Image}
+        duration={600}
         sx={[
           imageStyle,
           {

@@ -13,21 +13,14 @@ export type SelectType = {
   id: string;
 };
 
-export type ProfessorType = {
-  name: string;
-  faculties: string[];
-  id: string;
+export type ProfessorsAndAuditoriesType = {
+  auditory: string;
+  professor: ProfessorResponseType;
 };
 
 export type ScheduleType = {
   weekday: string;
-  professorsAndAuditories: {
-    auditory: string;
-    professor: {
-      name: string;
-      id: string;
-    };
-  }[];
+  professorsAndAuditories: ProfessorsAndAuditoriesType[];
   subject: string;
   lessonStarts: Timestamp;
   lessonEnds: Timestamp;
@@ -35,13 +28,7 @@ export type ScheduleType = {
   week: string;
 };
 export type SubjectUpdateValues = {
-  professorsAndAuditories: Array<{
-    auditory: string;
-    professor: {
-      name: string;
-      id: string;
-    };
-  }>;
+  professorsAndAuditories: ProfessorsAndAuditoriesType[];
   subject: string;
   start: Date;
 };
@@ -53,13 +40,7 @@ export type CourseFormValues = {
   };
   weeks: string[];
   weekday: string;
-  professorsAndAuditories: Array<{
-    auditory: string;
-    professor: {
-      name: string;
-      id: string;
-    };
-  }>;
+  professorsAndAuditories: ProfessorsAndAuditoriesType[];
   subject: string;
   start: Date;
 };
@@ -75,23 +56,35 @@ export type SubjectFormValues = {
   fieldOfStudy: FieldOfStudy;
 };
 
-export type ProfessorFormValues = {
+export type ProfessorResponseType = {
   firstname: string;
   surname: string;
   patronym: string;
-  picture: File;
+  PFP_URL: string;
+  PFP_THUMBNAIL_URL: string;
+  shortname: string;
+  fullname: string;
+  documentID: string;
+};
+
+export type ProfessorFormRequestType = {
+  firstname: string;
+  surname: string;
+  patronym: string;
   PFP: File;
   PFPThumbnail: File;
+  shortname: string;
+  fullname: string;
 };
 
 export enum RoutesPaths {
   home = "/",
-  course = "/addcourse",
-  subject = "/addsubject",
-  professor = "/professor",
-  scheduleDetails = "/addcourse/:id",
-  addProfessor = "/addProfessor",
-  updateProfessor = "/updateProfessor",
+  course = "addcourse",
+  subject = "addsubject",
+  professor = "professor",
+  scheduleDetails = "addcourse/:id",
+  addProfessor = "addProfessor",
+  updateProfessor = "updateProfessor",
 }
 
 export type FormFieldType<T extends FieldValues> = {

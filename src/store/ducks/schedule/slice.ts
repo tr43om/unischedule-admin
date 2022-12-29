@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   SelectType,
   SubjectType,
-  ProfessorType,
+  ProfessorResponseType,
   ScheduleType,
 } from "../../../types";
 import { fetchGroups, fetchSubjects } from "./actions";
@@ -17,8 +17,8 @@ type ScheduleSliceType = {
   subjects: SubjectType[];
 
   selectedProfessorIDs: string[];
-  professors: ProfessorType[];
-  selectedProfessors: ProfessorType[];
+  professors: ProfessorResponseType[];
+  selectedProfessors: ProfessorResponseType[];
 
   currentSchedule: ScheduleType[];
 };

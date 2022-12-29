@@ -145,7 +145,7 @@ const SubjectFormPage = () => {
               sx={{ listStyle: "none", maxWidth: "300px" }}
               onClick={() => console.log(option)}
             >
-              <SubjectCard index={index} option={option} />
+              <SubjectCard option={option} />
             </Grid>
           ))}
       </Grid>

@@ -1,58 +1,33 @@
-import { Tab, Tabs } from "@mui/material";
-import React, { ReactNode } from "react";
-import { Link, Route, Routes } from "react-router-dom";
+import { Tabs } from "@mui/material";
+import React, { useState, SyntheticEvent } from "react";
+import { Outlet } from "react-router-dom";
 import { RoutesPaths } from "../../types";
-import { AddProfessorTab, UpdateProfessorTab } from "./tabs";
 import EditIcon from "@mui/icons-material/Edit";
-import { TabProps } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-
-interface LinkTabProps {
-  label?: string;
-  to: string;
-  icon?:
-    | string
-    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-    | undefined;
-}
-
-function LinkTab(props: LinkTabProps) {
-  return <Tab component={Link} {...props} />;
-}
+import { LinkTab } from "../../components";
 
 const ProfessorFormPage = () => {
-  const [value, setValue] = React.useState(0);
+  const [tab, setTab] = useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const changeTab = (event: SyntheticEvent, newTab: number) => {
+    setTab(newTab);
   };
   return (
     <>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        sx={{ mb: 7 }}
-        variant="fullWidth"
-      >
+      <Tabs value={tab} onChange={changeTab} sx={{ mb: 7 }} variant="fullWidth">
         <LinkTab
-          to={`${RoutesPaths.professor}${RoutesPaths.addProfessor}`}
+          to={RoutesPaths.addProfessor}
           label="Добавить"
           icon={<PersonAddIcon />}
         />
         <LinkTab
-          to={`${RoutesPaths.professor}${RoutesPaths.updateProfessor}`}
+          to={RoutesPaths.updateProfessor}
           label="Изменить"
           icon={<EditIcon />}
         />
       </Tabs>
 
-      <Routes>
-        <Route path={RoutesPaths.addProfessor} element={<AddProfessorTab />} />
-        <Route
-          path={RoutesPaths.updateProfessor}
-          element={<UpdateProfessorTab />}
-        />
-      </Routes>
+      <Outlet />
     </>
   );
 };

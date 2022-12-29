@@ -10,7 +10,6 @@ import {
   Box,
 } from "@mui/material";
 import { ScheduleType } from "../../types";
-import { useSwiperSlide } from "swiper/react";
 import LaunchIcon from "@mui/icons-material/Launch";
 
 import { Link as RouterLink } from "react-router-dom";
@@ -43,7 +42,7 @@ const ScheduleCard = ({ schedule }: ScheduleCardProps) => {
   return (
     <Box
       component={RouterLink}
-      to={`${RoutesPaths.course}/${schedule.id}`}
+      to={`${schedule.id}`}
       sx={{ cursor: "pointer", textDecoration: "none" }}
     >
       <Card variant="elevation" elevation={3}>
@@ -65,7 +64,7 @@ const ScheduleCard = ({ schedule }: ScheduleCardProps) => {
           <Stack gap={2}>
             {schedule.professorsAndAuditories.map((el) => (
               <>
-                <Typography>{el.professor.name}</Typography>
+                <Typography>{el.professor.fullname}</Typography>
                 <Typography>{el.auditory} кабинет</Typography>
               </>
             ))}

@@ -23,9 +23,19 @@ function App() {
           element={<ScheduleDetailsPage />}
         />
         <Route
-          path={`${RoutesPaths.professor}/*`}
+          path={`${RoutesPaths.professor}`}
           element={<ProfessorFormPage />}
-        ></Route>
+        >
+          <Route index element={<AddProfessorTab />} />
+          <Route
+            path={RoutesPaths.addProfessor}
+            element={<AddProfessorTab />}
+          />
+          <Route
+            path={RoutesPaths.updateProfessor}
+            element={<UpdateProfessorTab />}
+          />
+        </Route>
       </Route>
     </Routes>
   );

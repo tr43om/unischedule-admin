@@ -1,19 +1,12 @@
 import {
-  Box,
   Button,
   Card,
   CardContent,
   CardHeader,
   IconButton,
-  Typography,
 } from "@mui/material";
 import React from "react";
-import {
-  useParams,
-  useNavigate,
-  useNavigation,
-  NavigateFunction,
-} from "react-router-dom";
+import { useParams, useNavigate, NavigateFunction } from "react-router-dom";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import { useSelector } from "react-redux";
 import {
@@ -23,28 +16,15 @@ import {
   currentWeekdaySelector,
 } from "../../store/ducks/schedule/selectors";
 import { SelectLessonForm } from "../../components";
-import {
-  RoutesPaths,
-  ScheduleType,
-  SubjectUpdateValues,
-  CourseFormValues,
-} from "../../types";
+import { RoutesPaths, CourseFormValues } from "../../types";
 import { DefaultValues } from "react-hook-form/dist/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import {
-  collection,
-  CollectionReference,
-  doc,
-  updateDoc,
-  DocumentReference,
-} from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { useEffect } from "react";
-import { redirect } from "react-router-dom";
-import { useDocumentData } from "react-firebase-hooks/firestore";
 import { addMinutes } from "date-fns";
 import { useSnackbar } from "notistack";
 

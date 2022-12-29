@@ -45,15 +45,7 @@ const CourseFormPage = () => {
     group,
     weeks,
     weekday,
-    professorsAndAuditories: [
-      {
-        auditory: "",
-        professor: {
-          id: "",
-          name: "",
-        },
-      },
-    ],
+    professorsAndAuditories: [],
     subject: "",
     start: new Date(new Date().setHours(0, 0, 0, 0)),
   };
